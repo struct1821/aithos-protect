@@ -393,7 +393,7 @@ export function AgentPanel({
 
       {/* controls */}
       {s.stage >= 0 && (
-        <div className="flex items-center justify-between gap-2 border-t border-border bg-background/60 px-5 py-3">
+        <div className="flex items-center justify-between gap-2 border-t border-border bg-background/60 px-5 py-2.5">
           <button
             onClick={demo.back}
             disabled={s.stage <= 0}
@@ -405,7 +405,7 @@ export function AgentPanel({
             onClick={demo.restart}
             className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs text-muted-foreground transition-colors hover:text-foreground"
           >
-            <RotateCcw className="size-3.5" /> Restart Demo
+            <RotateCcw className="size-3.5" /> Restart
           </button>
           <button
             onClick={demo.next}
@@ -416,6 +416,34 @@ export function AgentPanel({
           </button>
         </div>
       )}
+
+      {/* composer */}
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          demo.submit(draft, scenarios);
+          setDraft("");
+          inputRef.current?.focus();
+        }}
+        className="flex items-center gap-2 border-t border-border bg-background/70 px-4 py-3"
+      >
+        <input
+          ref={inputRef}
+          value={draft}
+          onChange={(e) => setDraft(e.target.value)}
+          placeholder="Ask AITHOS to do something on this page..."
+          className="min-w-0 flex-1 rounded-xl border border-border bg-surface/70 px-3.5 py-2.5 text-sm outline-none transition-colors placeholder:text-muted-foreground focus:border-primary/50"
+        />
+        <button
+          type="submit"
+          disabled={!draft.trim()}
+          aria-label="Send request"
+          className="inline-flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary text-primary-foreground transition-opacity hover:opacity-90 disabled:opacity-35"
+        >
+          <Send className="size-4" />
+        </button>
+      </form>
+
     </div>
   );
 }
