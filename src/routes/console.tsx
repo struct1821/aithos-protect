@@ -49,7 +49,7 @@ function ConsolePage() {
   const s = useDemo();
   const active = s.scenario !== null;
   const blocked = s.scenario === "leak";
-  const command = s.scenario ? COMMANDS[s.scenario] : "No active request";
+  const command = s.prompt || (s.scenario ? COMMANDS[s.scenario] : "No active request");
   const cfg = s.scenario && s.scenario !== "leak" ? SCENARIOS[s.scenario] : null;
   const fields = cfg?.fields ?? SENSITIVE_FIELDS;
   const count = !active ? 0 : blocked ? 1 : s.stage >= 1 ? fields.length : 0;
