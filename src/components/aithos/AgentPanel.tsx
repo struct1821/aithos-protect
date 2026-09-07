@@ -14,7 +14,7 @@ import {
   Send,
   ShieldAlert,
   ShieldCheck,
-  Sparkles,
+  
   X,
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
