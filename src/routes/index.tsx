@@ -35,12 +35,14 @@ function Landing() {
   const navigate = useNavigate();
 
   const startDemo = () => {
-    demo.start("statement");
+    demo.closePanel();
+    demo.reset();
     navigate({ to: "/bank" });
   };
 
   const startFlightDemo = () => {
-    demo.start("flight");
+    demo.closePanel();
+    demo.reset();
     navigate({ to: "/travel" });
   };
 
