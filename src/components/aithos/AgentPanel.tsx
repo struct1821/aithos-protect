@@ -558,7 +558,6 @@ export function AgentLauncher() {
         <span className="absolute inline-flex size-full animate-pulse-ring rounded-full bg-primary-foreground/60" />
         <span className="relative inline-flex size-2.5 rounded-full bg-primary-foreground" />
       </span>
-      <Sparkles className="size-4" />
       AITHOS Agent
       {s.panelOpen && <X className="size-4 opacity-70" />}
     </button>
