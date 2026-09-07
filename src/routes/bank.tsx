@@ -43,10 +43,10 @@ const TRANSACTIONS = [
 ];
 
 const CUSTOMER = [
-  { label: "Name", value: "Rahul Sharma" },
-  { label: "Email", value: "rahul.sharma@example.com" },
-  { label: "Phone", value: "+91 98765 43210" },
-  { label: "PAN", value: "ABCDE1234F" },
+  { label: "Name", value: "Rahul Sharma", token: "[NAME]" },
+  { label: "Email", value: "rahul.sharma@example.com", token: "[EMAIL]" },
+  { label: "Phone", value: "+91 98765 43210", token: "[PHONE]" },
+  { label: "PAN", value: "ABCDE1234F", token: "[PAN]" },
 ];
 
 function BankPage() {
