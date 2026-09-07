@@ -116,7 +116,7 @@ type Voice = {
   done: string[];
 };
 
-const BASE_VOICE: Omit<Voice, "ack" | "reason" | "execute" | "done"> = {
+const BASE_VOICE: Pick<Voice, "protect" | "context" | "reason" | "verify"> = {
   protect: [
     "Before I touch anything, let me scan this page for personal details — I don't want any of it leaving your device.",
     "One second — I'm checking what's on screen that shouldn't be shared.",
