@@ -65,7 +65,7 @@ export function AgentPanel() {
   }, [s.stage, s.working, s.downloaded]);
 
   if (!s.panelOpen) return null;
-  const progressIdx = s.stage >= 0 ? STAGES[s.stage].progress : -1;
+  const progressIdx = s.stage >= 0 ? STAGES[s.stage]!.progress : -1;
 
   return (
     <div className="fixed right-6 bottom-24 z-50 flex max-h-[78vh] w-[min(28rem,calc(100vw-3rem))] flex-col overflow-hidden rounded-2xl glass shadow-2xl glow-border animate-rise">
@@ -198,7 +198,7 @@ export function AgentPanel() {
         {s.scenario === "statement" && s.stage >= 0 && (
           <>
             <Card>
-              <StageHeader title={STAGES[0].title} done={s.stage > 0 || !s.working} />
+              <StageHeader title={STAGES[0]!.title} done={s.stage > 0 || !s.working} />
               {(s.stage > 0 || !s.working) && (
                 <div className="mt-3 space-y-1">
                   <Row label="User intent" value={COMMANDS.statement} />
@@ -211,7 +211,7 @@ export function AgentPanel() {
 
             {s.stage >= 1 && (
               <Card>
-                <StageHeader title={STAGES[1].title} done={s.stage > 1 || !s.working} />
+                <StageHeader title={STAGES[1]!.title} done={s.stage > 1 || !s.working} />
                 <div className="relative mt-3 overflow-hidden rounded-lg bg-background/60 p-3">
                   {s.stage === 1 && s.working && (
                     <span className="pointer-events-none absolute inset-x-0 top-0 h-8 animate-scan bg-gradient-to-b from-transparent via-primary/25 to-transparent" />
@@ -242,7 +242,7 @@ export function AgentPanel() {
 
             {s.stage >= 2 && (
               <Card>
-                <StageHeader title={STAGES[2].title} done={s.stage > 2 || !s.working} />
+                <StageHeader title={STAGES[2]!.title} done={s.stage > 2 || !s.working} />
                 <div className="mt-3 grid grid-cols-2 gap-3">
                   <div className="rounded-lg border border-border bg-background/50 p-3">
                     <div className="mb-2 font-mono text-[10px] tracking-widest text-muted-foreground">
@@ -285,7 +285,7 @@ export function AgentPanel() {
 
             {s.stage >= 3 && (
               <Card>
-                <StageHeader title={STAGES[3].title} done={s.stage > 3 || !s.working} />
+                <StageHeader title={STAGES[3]!.title} done={s.stage > 3 || !s.working} />
                 {(s.stage > 3 || !s.working) && (
                   <div className="mt-3 space-y-1">
                     <Row label="User request" value={COMMANDS.statement} />
@@ -304,7 +304,7 @@ export function AgentPanel() {
 
             {s.stage >= 4 && (
               <Card>
-                <StageHeader title={STAGES[4].title} done={s.stage > 4 || !s.working} />
+                <StageHeader title={STAGES[4]!.title} done={s.stage > 4 || !s.working} />
                 <ul className="mt-3 space-y-1.5">
                   {[
                     "Action matches user intent",
@@ -331,7 +331,7 @@ export function AgentPanel() {
 
             {s.stage >= 5 && (
               <Card>
-                <StageHeader title={STAGES[5].title} done={s.downloaded} />
+                <StageHeader title={STAGES[5]!.title} done={s.downloaded} />
                 {s.downloaded ? (
                   <div className="mt-4 flex flex-col items-center gap-2 py-4">
                     <span className="relative flex size-14 items-center justify-center rounded-full bg-[color-mix(in_oklab,var(--success)_16%,transparent)]">
