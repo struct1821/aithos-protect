@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { ArrowRight, Eye, Gauge, MousePointerClick, ShieldCheck, Sparkles } from "lucide-react";
+import { ArrowRight, Eye, Gauge, MousePointerClick, Plane, ShieldCheck, Sparkles } from "lucide-react";
 import { PrivacyFlow } from "@/components/aithos/PrivacyFlow";
 import { demo } from "@/lib/aithos-demo";
 
@@ -39,6 +39,11 @@ function Landing() {
     navigate({ to: "/bank" });
   };
 
+  const startFlightDemo = () => {
+    demo.start("flight");
+    navigate({ to: "/travel" });
+  };
+
   return (
     <div className="min-h-screen">
       <div className="relative overflow-hidden" style={{ background: "var(--gradient-hero)" }}>
@@ -50,7 +55,13 @@ function Landing() {
               to="/bank"
               className="rounded-lg px-3.5 py-1.5 text-muted-foreground transition-colors hover:text-foreground"
             >
-              Demo Website
+              Banking Demo
+            </Link>
+            <Link
+              to="/travel"
+              className="rounded-lg px-3.5 py-1.5 text-muted-foreground transition-colors hover:text-foreground"
+            >
+              Flight Demo
             </Link>
             <Link
               to="/console"
@@ -78,6 +89,12 @@ function Landing() {
               className="inline-flex items-center gap-2 rounded-xl bg-primary px-7 py-4 text-sm font-semibold text-primary-foreground shadow-[var(--glow-strong)] transition-transform hover:scale-[1.02]"
             >
               Start Live Demo <ArrowRight className="size-4" />
+            </button>
+            <button
+              onClick={startFlightDemo}
+              className="inline-flex items-center gap-2 rounded-xl border border-primary/30 px-6 py-4 text-sm text-primary transition-colors hover:bg-primary/10"
+            >
+              <Plane className="size-4" /> Book a Flight Demo
             </button>
             <Link
               to="/console"
