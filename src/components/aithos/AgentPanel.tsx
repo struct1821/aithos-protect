@@ -235,7 +235,7 @@ export function AgentPanel({
               <StageHeader title={STAGES[0]!.title} done={s.stage > 0 || !s.working} />
               {(s.stage > 0 || !s.working) && (
                 <div className="mt-3 space-y-1">
-                  <Row label="User intent" value={COMMANDS[s.scenario!]} />
+                  <Row label="User intent" value={s.prompt} />
                   <div className="flex items-center gap-2 pt-1 text-sm text-[var(--color-success)]">
                     <Check className="size-4" /> Request understood
                   </div>
@@ -322,7 +322,7 @@ export function AgentPanel({
                 <StageHeader title={STAGES[3]!.title} done={s.stage > 3 || !s.working} />
                 {(s.stage > 3 || !s.working) && (
                   <div className="mt-3 space-y-1">
-                    <Row label="User request" value={COMMANDS[s.scenario!]} />
+                    <Row label="User request" value={s.prompt} />
                     <Row label="Available page action" value={cfg.actionLabel} />
                     <div className="mt-2 flex items-center gap-2 rounded-lg bg-primary/10 px-3 py-2 font-mono text-xs text-primary">
                       <MousePointerClick className="size-4" />
