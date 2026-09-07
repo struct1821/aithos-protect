@@ -121,7 +121,7 @@ function runStage(stage: number) {
   const resolveIn = stage === 1 ? 1600 : 900;
   later(() => {
     set({ working: false });
-    if (stage === 5 && state.scenario === "statement") {
+    if (stage === 5 && state.scenario !== "leak") {
       set({ clicking: true });
       later(() => set({ clicking: false, downloaded: true }), 1100);
     }
