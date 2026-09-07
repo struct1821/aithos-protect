@@ -105,6 +105,34 @@ export const SCENARIOS: Record<Exclude<Scenario, "leak">, ScenarioConfig> = {
   },
 };
 
+/**
+ * Split-compute model: which work runs on-device vs which is sent to the cloud.
+ * Anything touching personal information stays local — the cloud only ever
+ * receives a masked description and returns a suggested action.
+ */
+export const LOCAL_WORK = [
+  "Reading the page and its form fields",
+  "Detecting personal information",
+  "Masking every sensitive value",
+  "Re-filling real values into the page",
+  "Performing the click / form submission",
+];
+
+export const CLOUD_WORK = ["Suggesting which control matches the request"];
+
+/** The masked message that actually leaves the device. */
+export function cloudRequestText(
+  prompt: string,
+  fields: readonly { token: string; label: string }[],
+  actionLabels: string[],
+) {
+  return [
+    `user_request: "${prompt}"`,
+    `page_fields: ${fields.map((f) => f.token).join(", ") || "none"}`,
+    `available_actions: ${actionLabels.map((a) => `"${a}"`).join(", ")}`,
+  ].join("\n");
+}
+
 /** Conversational lines the agent "says" at each stage. */
 type Voice = {
   ack: string[];
@@ -123,14 +151,14 @@ const BASE_VOICE: Pick<Voice, "protect" | "context" | "reason" | "verify"> = {
     "Quick privacy sweep first. Anything identifying gets masked locally.",
   ],
   context: [
-    "Okay, everything sensitive is swapped for placeholders. The AI reasoning happens on this masked version, so your real details never travel.",
+    "Okay, everything sensitive is swapped for placeholders on-device. Only this masked version can leave your device.",
     "Done — your details are replaced with tokens. What I reason over is meaningless to anyone else.",
     "Masked and ready. I kept the structure so I can still act correctly, minus the real values.",
   ],
   reason: [
-    "Now I'm working out which control on this page actually does what you asked.",
-    "Let me look at what's clickable here and match it to your request.",
-    "Figuring out the right control to use — I only want to touch the one that matters.",
+    "I'm sending only the masked description to the cloud model and asking it which control to use — nothing personal goes with it.",
+    "Time for a second opinion. The cloud AI gets placeholders and a list of buttons, and suggests one back.",
+    "Asking the cloud model for a suggestion. It never sees your real details — just tokens and the page's controls.",
   ],
   verify: [
     "Before I click, I'm double-checking this is safe and really is what you meant.",
