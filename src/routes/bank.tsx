@@ -99,7 +99,17 @@ function BankPage() {
       </header>
 
       <main className="mx-auto max-w-6xl px-6 py-10">
-        <h1 className="font-display text-3xl font-semibold">Good morning, Rahul</h1>
+        <h1 className="font-display text-3xl font-semibold">
+          Good morning,{" "}
+          <span
+            className={cn(
+              "inline-block transition-all duration-500",
+              protecting && "select-none blur-[5px] text-primary",
+            )}
+          >
+            Rahul
+          </span>
+        </h1>
         <p className="mt-1.5 text-sm text-muted-foreground">
           Here's a snapshot of your account activity.
         </p>
