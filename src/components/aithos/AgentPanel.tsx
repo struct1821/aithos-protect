@@ -17,11 +17,12 @@ import {
 import { useEffect, useRef } from "react";
 import {
   COMMANDS,
-  SENSITIVE_FIELDS,
+  SCENARIOS,
   STAGES,
   STEP_LABELS,
   demo,
   useDemo,
+  type Scenario,
 } from "@/lib/aithos-demo";
 import { cn } from "@/lib/utils";
 
@@ -56,7 +57,11 @@ function Card({ children, className }: { children: React.ReactNode; className?: 
   );
 }
 
-export function AgentPanel() {
+export function AgentPanel({
+  scenarios = ["statement", "leak"],
+}: {
+  scenarios?: Scenario[];
+}) {
   const s = useDemo();
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -66,6 +71,9 @@ export function AgentPanel() {
 
   if (!s.panelOpen) return null;
   const progressIdx = s.stage >= 0 ? STAGES[s.stage]!.progress : -1;
+  const cfg =
+    s.scenario && s.scenario !== "leak" ? SCENARIOS[s.scenario] : null;
+  const fields = cfg?.fields ?? [];
 
   return (
     <div className="fixed right-6 bottom-24 z-50 flex max-h-[78vh] w-[min(28rem,calc(100vw-3rem))] flex-col overflow-hidden rounded-2xl glass shadow-2xl glow-border animate-rise">
@@ -130,20 +138,28 @@ export function AgentPanel() {
               What would you like me to do?
             </p>
             <div className="space-y-2">
-              <button
-                onClick={() => demo.start("statement")}
-                className="group flex w-full items-center justify-between gap-3 rounded-xl border border-border bg-surface/70 px-4 py-3 text-left text-sm transition-all hover:border-primary/40 hover:bg-surface-2"
-              >
-                <span>{COMMANDS.statement}</span>
-                <Send className="size-4 text-primary opacity-60 transition-opacity group-hover:opacity-100" />
-              </button>
-              <button
-                onClick={() => demo.start("leak")}
-                className="group flex w-full items-center justify-between gap-3 rounded-xl border border-border bg-surface/70 px-4 py-3 text-left text-sm transition-all hover:border-[color-mix(in_oklab,var(--destructive)_50%,transparent)] hover:bg-surface-2"
-              >
-                <span>{COMMANDS.leak}</span>
-                <ShieldAlert className="size-4 text-[var(--color-destructive)] opacity-70 transition-opacity group-hover:opacity-100" />
-              </button>
+              {scenarios.map((sc) => {
+                const danger = sc === "leak";
+                return (
+                  <button
+                    key={sc}
+                    onClick={() => demo.start(sc)}
+                    className={cn(
+                      "group flex w-full items-center justify-between gap-3 rounded-xl border border-border bg-surface/70 px-4 py-3 text-left text-sm transition-all hover:bg-surface-2",
+                      danger
+                        ? "hover:border-[color-mix(in_oklab,var(--destructive)_50%,transparent)]"
+                        : "hover:border-primary/40",
+                    )}
+                  >
+                    <span>{COMMANDS[sc]}</span>
+                    {danger ? (
+                      <ShieldAlert className="size-4 text-[var(--color-destructive)] opacity-70 transition-opacity group-hover:opacity-100" />
+                    ) : (
+                      <Send className="size-4 text-primary opacity-60 transition-opacity group-hover:opacity-100" />
+                    )}
+                  </button>
+                );
+              })}
             </div>
             <p className="text-xs text-muted-foreground">
               Pick a suggested command to run the demonstration.
@@ -195,13 +211,13 @@ export function AgentPanel() {
         )}
 
         {/* MAIN SCENARIO */}
-        {s.scenario === "statement" && s.stage >= 0 && (
+        {cfg && s.stage >= 0 && (
           <>
             <Card>
               <StageHeader title={STAGES[0]!.title} done={s.stage > 0 || !s.working} />
               {(s.stage > 0 || !s.working) && (
                 <div className="mt-3 space-y-1">
-                  <Row label="User intent" value={COMMANDS.statement} />
+                  <Row label="User intent" value={COMMANDS[s.scenario!]} />
                   <div className="flex items-center gap-2 pt-1 text-sm text-[var(--color-success)]">
                     <Check className="size-4" /> Request understood
                   </div>
@@ -220,7 +236,7 @@ export function AgentPanel() {
                     <ScanLine className="size-3.5 text-primary" /> Sensitive information detected
                   </div>
                   <ul className="space-y-1.5">
-                    {SENSITIVE_FIELDS.map((f, i) => (
+                    {fields.map((f, i) => (
                       <li
                         key={f.key}
                         className="animate-rise flex items-center gap-2 text-sm"
@@ -234,7 +250,7 @@ export function AgentPanel() {
                 </div>
                 {(s.stage > 1 || !s.working) && (
                   <div className="mt-3 rounded-lg bg-primary/10 px-3 py-2 text-sm font-medium text-primary">
-                    5 sensitive items protected
+                    {fields.length} sensitive items protected
                   </div>
                 )}
               </Card>
@@ -249,7 +265,7 @@ export function AgentPanel() {
                       BEFORE
                     </div>
                     <div className="space-y-1 font-mono text-[11px] text-muted-foreground">
-                      {SENSITIVE_FIELDS.map((f) => (
+                      {fields.map((f) => (
                         <div key={f.key} className="truncate">
                           {f.raw}
                         </div>
@@ -261,7 +277,7 @@ export function AgentPanel() {
                       AFTER
                     </div>
                     <div className="space-y-1 font-mono text-[11px] text-primary">
-                      {SENSITIVE_FIELDS.map((f, i) => (
+                      {fields.map((f, i) => (
                         <div
                           key={f.key}
                           className="animate-rise truncate"
@@ -288,11 +304,11 @@ export function AgentPanel() {
                 <StageHeader title={STAGES[3]!.title} done={s.stage > 3 || !s.working} />
                 {(s.stage > 3 || !s.working) && (
                   <div className="mt-3 space-y-1">
-                    <Row label="User request" value={COMMANDS.statement} />
-                    <Row label="Available page action" value="Download Latest Statement" />
+                    <Row label="User request" value={COMMANDS[s.scenario!]} />
+                    <Row label="Available page action" value={cfg.actionLabel} />
                     <div className="mt-2 flex items-center gap-2 rounded-lg bg-primary/10 px-3 py-2 font-mono text-xs text-primary">
                       <MousePointerClick className="size-4" />
-                      → CLICK "Download Latest Statement"
+                      → CLICK "{cfg.actionLabel}"
                     </div>
                     <div className="flex items-center gap-2 pt-1 text-sm text-[var(--color-success)]">
                       <Check className="size-4" /> Action understood
@@ -338,7 +354,7 @@ export function AgentPanel() {
                       <span className="absolute inset-0 animate-pulse-ring rounded-full bg-[color-mix(in_oklab,var(--success)_25%,transparent)]" />
                       <CheckCircle2 className="size-8 text-[var(--color-success)]" />
                     </span>
-                    <div className="font-display text-lg font-semibold">Statement Downloaded</div>
+                    <div className="font-display text-lg font-semibold">{cfg.successTitle}</div>
                     <Link
                       to="/console"
                       className="mt-1 inline-flex items-center gap-1.5 text-xs text-primary hover:underline"
@@ -348,7 +364,7 @@ export function AgentPanel() {
                   </div>
                 ) : (
                   <p className="mt-3 text-sm text-muted-foreground">
-                    Clicking "Download Latest Statement" on the page...
+                    {cfg.executingText}
                   </p>
                 )}
               </Card>
