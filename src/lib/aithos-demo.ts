@@ -262,7 +262,7 @@ export const demo = {
   },
   restart() {
     if (!state.scenario) return;
-    demo.start(state.scenario, state.autoplay);
+    demo.start(state.scenario, state.autoplay, state.prompt);
   },
   setAutoplay(v: boolean) {
     set({ autoplay: v });
