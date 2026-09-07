@@ -1,8 +1,25 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Check, CheckCircle2, MousePointerClick, ShieldCheck, ShieldAlert } from "lucide-react";
+import {
+  Check,
+  CheckCircle2,
+  Cloud,
+  Cpu,
+  Lock,
+  MousePointerClick,
+  ShieldCheck,
+  ShieldAlert,
+} from "lucide-react";
 import { AgentLauncher, AgentPanel } from "@/components/aithos/AgentPanel";
 import { PrivacyFlow } from "@/components/aithos/PrivacyFlow";
-import { COMMANDS, SCENARIOS, SENSITIVE_FIELDS, demo, useDemo } from "@/lib/aithos-demo";
+import {
+  CLOUD_WORK,
+  COMMANDS,
+  LOCAL_WORK,
+  SCENARIOS,
+  SENSITIVE_FIELDS,
+  demo,
+  useDemo,
+} from "@/lib/aithos-demo";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/console")({
@@ -156,6 +173,40 @@ function ConsolePage() {
                   <div className="text-xs text-muted-foreground">Raw PII shared</div>
                   <div className="font-display text-7xl leading-none font-bold text-gradient-cyan">
                     0
+                  </div>
+                </div>
+              </div>
+            </Panel>
+
+            <Panel title="Where The Work Happens">
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="rounded-xl border border-primary/30 bg-primary/8 p-4">
+                  <div className="flex items-center gap-2 text-sm font-semibold text-primary">
+                    <Cpu className="size-4" /> On your device
+                  </div>
+                  <ul className="mt-3 space-y-1.5 text-sm text-muted-foreground">
+                    {LOCAL_WORK.map((w) => (
+                      <li key={w} className="flex gap-2">
+                        <Lock className="mt-0.5 size-3.5 shrink-0 text-primary" />
+                        {w}
+                      </li>
+                    ))}
+                  </ul>
+                  <div className="mt-3 text-xs font-medium text-[var(--color-success)]">
+                    Anything touching personal information runs here
+                  </div>
+                </div>
+                <div className="rounded-xl border border-border bg-background/50 p-4">
+                  <div className="flex items-center gap-2 text-sm font-semibold text-muted-foreground">
+                    <Cloud className="size-4" /> Cloud AI
+                  </div>
+                  <ul className="mt-3 space-y-1.5 text-sm text-muted-foreground">
+                    {CLOUD_WORK.map((w) => (
+                      <li key={w}>• {w}</li>
+                    ))}
+                  </ul>
+                  <div className="mt-3 text-xs text-muted-foreground">
+                    Receives masked tokens and a list of buttons — nothing else
                   </div>
                 </div>
               </div>
