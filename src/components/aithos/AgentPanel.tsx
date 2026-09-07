@@ -18,6 +18,8 @@ import { useEffect, useRef, useState } from "react";
 import {
   COMMANDS,
   SCENARIOS,
+  agentLine,
+  noMatchLine,
   STAGES,
   STEP_LABELS,
   demo,
@@ -45,6 +47,30 @@ function Row({ label, value }: { label: string; value: string }) {
     <div className="flex items-center justify-between gap-4 py-1.5 text-sm">
       <span className="text-muted-foreground">{label}</span>
       <span className="font-medium">{value}</span>
+    </div>
+  );
+}
+
+function Typing() {
+  return (
+    <span className="flex items-center gap-1 py-1">
+      {[0, 1, 2].map((i) => (
+        <span
+          key={i}
+          className="size-1.5 animate-pulse rounded-full bg-muted-foreground/70"
+          style={{ animationDelay: `${i * 180}ms` }}
+        />
+      ))}
+    </span>
+  );
+}
+
+/** A conversational message from the agent. */
+function Say({ text, typing }: { text: string | null; typing?: boolean }) {
+  if (!typing && !text) return null;
+  return (
+    <div className="animate-rise w-fit max-w-[90%] rounded-2xl rounded-bl-sm bg-surface-2 px-3.5 py-2 text-sm leading-relaxed text-foreground">
+      {typing ? <Typing /> : text}
     </div>
   );
 }
@@ -174,7 +200,7 @@ export function AgentPanel({
                   {s.unmatched}
                 </div>
                 <div className="w-fit max-w-[90%] rounded-2xl rounded-bl-sm bg-surface-2 px-3.5 py-2 text-sm text-muted-foreground">
-                  I can't find an action for that on this page. Try one of the requests above.
+                  {noMatchLine(s.seed)}
                 </div>
               </div>
             ) : (
@@ -195,6 +221,10 @@ export function AgentPanel({
         {/* BLOCKED SCENARIO */}
         {s.scenario === "leak" && s.stage >= 0 && (
           <>
+            <Say
+              text={agentLine("leak", 0, s.seed)}
+              typing={s.stage === 0 && s.working}
+            />
             <Card>
               <StageHeader title="Understanding your request..." done={s.stage > 0 || !s.working} />
               {(s.stage > 0 || !s.working) && (
@@ -206,6 +236,9 @@ export function AgentPanel({
                 </div>
               )}
             </Card>
+            {s.stage >= 1 && (
+              <Say text={agentLine("leak", 1, s.seed, !s.working)} typing={s.working} />
+            )}
             {s.stage >= 1 && (
               <Card className="border-[color-mix(in_oklab,var(--destructive)_35%,transparent)]">
                 <StageHeader title="Checking privacy policy..." done={!s.working} />
@@ -238,6 +271,7 @@ export function AgentPanel({
         {/* MAIN SCENARIO */}
         {cfg && s.stage >= 0 && (
           <>
+            <Say text={agentLine(s.scenario!, 0, s.seed)} typing={s.stage === 0 && s.working} />
             <Card>
               <StageHeader title={STAGES[0]!.title} done={s.stage > 0 || !s.working} />
               {(s.stage > 0 || !s.working) && (
@@ -250,6 +284,9 @@ export function AgentPanel({
               )}
             </Card>
 
+            {s.stage >= 1 && (
+              <Say text={agentLine(s.scenario!, 1, s.seed)} typing={s.stage === 1 && s.working} />
+            )}
             {s.stage >= 1 && (
               <Card>
                 <StageHeader title={STAGES[1]!.title} done={s.stage > 1 || !s.working} />
@@ -281,6 +318,9 @@ export function AgentPanel({
               </Card>
             )}
 
+            {s.stage >= 2 && (
+              <Say text={agentLine(s.scenario!, 2, s.seed)} typing={s.stage === 2 && s.working} />
+            )}
             {s.stage >= 2 && (
               <Card>
                 <StageHeader title={STAGES[2]!.title} done={s.stage > 2 || !s.working} />
@@ -325,6 +365,9 @@ export function AgentPanel({
             )}
 
             {s.stage >= 3 && (
+              <Say text={agentLine(s.scenario!, 3, s.seed)} typing={s.stage === 3 && s.working} />
+            )}
+            {s.stage >= 3 && (
               <Card>
                 <StageHeader title={STAGES[3]!.title} done={s.stage > 3 || !s.working} />
                 {(s.stage > 3 || !s.working) && (
@@ -343,6 +386,9 @@ export function AgentPanel({
               </Card>
             )}
 
+            {s.stage >= 4 && (
+              <Say text={agentLine(s.scenario!, 4, s.seed)} typing={s.stage === 4 && s.working} />
+            )}
             {s.stage >= 4 && (
               <Card>
                 <StageHeader title={STAGES[4]!.title} done={s.stage > 4 || !s.working} />
@@ -370,6 +416,12 @@ export function AgentPanel({
               </Card>
             )}
 
+            {s.stage >= 5 && (
+              <Say
+                text={agentLine(s.scenario!, 5, s.seed, s.downloaded)}
+                typing={s.working}
+              />
+            )}
             {s.stage >= 5 && (
               <Card>
                 <StageHeader title={STAGES[5]!.title} done={s.downloaded} />

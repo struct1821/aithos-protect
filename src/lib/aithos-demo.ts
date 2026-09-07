@@ -105,6 +105,183 @@ export const SCENARIOS: Record<Exclude<Scenario, "leak">, ScenarioConfig> = {
   },
 };
 
+/** Conversational lines the agent "says" at each stage. */
+type Voice = {
+  ack: string[];
+  protect: string[];
+  context: string[];
+  reason: string[];
+  verify: string[];
+  execute: string[];
+  done: string[];
+};
+
+const BASE_VOICE: Pick<Voice, "protect" | "context" | "reason" | "verify"> = {
+  protect: [
+    "Before I touch anything, let me scan this page for personal details — I don't want any of it leaving your device.",
+    "One second — I'm checking what's on screen that shouldn't be shared.",
+    "Quick privacy sweep first. Anything identifying gets masked locally.",
+  ],
+  context: [
+    "Okay, everything sensitive is swapped for placeholders. The AI reasoning happens on this masked version, so your real details never travel.",
+    "Done — your details are replaced with tokens. What I reason over is meaningless to anyone else.",
+    "Masked and ready. I kept the structure so I can still act correctly, minus the real values.",
+  ],
+  reason: [
+    "Now I'm working out which control on this page actually does what you asked.",
+    "Let me look at what's clickable here and match it to your request.",
+    "Figuring out the right control to use — I only want to touch the one that matters.",
+  ],
+  verify: [
+    "Before I click, I'm double-checking this is safe and really is what you meant.",
+    "Running my safety checks — right target, visible, permitted, matches your intent.",
+    "Just validating the action so I don't do anything you didn't ask for.",
+  ],
+};
+
+const VOICES: Record<Exclude<Scenario, "leak">, Voice> = {
+  statement: {
+    ack: [
+      "Sure — you want your most recent statement. Let me handle that for you.",
+      "Got it, I'll pull up your latest statement.",
+    ],
+    reason: BASE_VOICE.reason,
+    protect: BASE_VOICE.protect,
+    context: BASE_VOICE.context,
+    verify: BASE_VOICE.verify,
+    execute: [
+      "All clear — downloading your statement now.",
+      "Checks passed. Grabbing the statement for you.",
+    ],
+    done: [
+      "Your statement is downloaded. Nothing personal was sent anywhere — zero raw details shared.",
+      "Done! Statement saved, and your account details never left this device.",
+    ],
+  },
+  transactions: {
+    ack: [
+      "Happy to — let me open your recent transactions.",
+      "Sure thing, I'll bring up your recent activity.",
+    ],
+    reason: BASE_VOICE.reason,
+    protect: BASE_VOICE.protect,
+    context: BASE_VOICE.context,
+    verify: BASE_VOICE.verify,
+    execute: ["Opening your transactions now.", "Safe to proceed — pulling up your activity."],
+    done: [
+      "There you go — your recent transactions are open, with none of your personal details exposed.",
+      "Transactions are up. Everything identifying stayed masked the whole time.",
+    ],
+  },
+  history: {
+    ack: [
+      "Of course — let me find your older statements.",
+      "Sure, I'll open your statement history.",
+    ],
+    reason: BASE_VOICE.reason,
+    protect: BASE_VOICE.protect,
+    context: BASE_VOICE.context,
+    verify: BASE_VOICE.verify,
+    execute: ["Opening your statement history.", "All good — loading your past statements."],
+    done: [
+      "Your statement history is open. No personal data was shared to get there.",
+      "Done — past statements are showing, privacy intact.",
+    ],
+  },
+  flight: {
+    ack: [
+      "Sure — a flight to Delhi. I'll fill in the booking for you.",
+      "Got it, let me book that Delhi flight.",
+    ],
+    reason: BASE_VOICE.reason,
+    protect: [
+      "This form has your passport, birth date and card on it — let me lock those down before I do anything.",
+      "Booking pages are sensitive. Scanning for passport, card and personal details first.",
+    ],
+    context: BASE_VOICE.context,
+    verify: [
+      "A booking spends money, so I'm being extra careful before confirming.",
+      "Double-checking everything before I confirm — this one's irreversible.",
+    ],
+    execute: [
+      "Everything checks out — filling the form and confirming the booking.",
+      "Approved. Completing your booking now.",
+    ],
+    done: [
+      "Your flight is booked. Your passport and card details were never exposed — only masked placeholders were used for reasoning.",
+      "Booked! And none of your travel documents or payment details were shared.",
+    ],
+  },
+  seats: {
+    ack: ["Sure — let me change your seat.", "Got it, I'll sort your seat out."],
+    reason: BASE_VOICE.reason,
+    protect: BASE_VOICE.protect,
+    context: BASE_VOICE.context,
+    verify: BASE_VOICE.verify,
+    execute: ["Opening seat selection and picking a window seat.", "Safe to go — updating your seat."],
+    done: [
+      "Seat updated. Your booking details stayed private the whole way through.",
+      "Done — new seat is set, and nothing personal was shared.",
+    ],
+  },
+};
+
+const LEAK_VOICE = {
+  ack: [
+    "Hold on — I need to look at what you're asking me to share.",
+    "Let me check that request before I do anything.",
+  ],
+  block: [
+    "I can't do that one. Your account number is exactly the kind of thing I'm built to keep off the wire — I'll happily use it locally to complete a task, but I won't hand it to a model.",
+    "That's a no from me. Sending your account number to an AI would defeat the point — I can act on your account without ever revealing it.",
+  ],
+};
+
+const NO_MATCH = [
+  "I'm not seeing anything on this page that does that. Try one of the suggestions above and I'll take it from there.",
+  "Hmm — I couldn't find a control here that matches that. Want to try one of the requests above?",
+];
+
+function pick(list: string[], seed: number): string {
+  return list[seed % list.length] ?? list[0]!;
+}
+
+/** The line the agent "says" for a given stage of the current run. */
+export function agentLine(
+  scenario: Scenario,
+  stage: number,
+  seed: number,
+  finished = false,
+): string | null {
+  if (scenario === "leak") {
+    if (stage === 0) return pick(LEAK_VOICE.ack, seed);
+    if (stage === 1) return finished ? pick(LEAK_VOICE.block, seed) : null;
+    return null;
+  }
+  const v = VOICES[scenario];
+  if (!v) return null;
+  switch (stage) {
+    case 0:
+      return pick(v.ack, seed);
+    case 1:
+      return pick(v.protect, seed);
+    case 2:
+      return pick(v.context, seed);
+    case 3:
+      return pick(v.reason, seed);
+    case 4:
+      return pick(v.verify, seed);
+    case 5:
+      return finished ? pick(v.done, seed) : pick(v.execute, seed);
+    default:
+      return null;
+  }
+}
+
+export function noMatchLine(seed: number) {
+  return pick(NO_MATCH, seed);
+}
+
 const LEAK_KEYWORDS = [
   "send my account",
   "share my account",
@@ -119,6 +296,7 @@ const LEAK_KEYWORDS = [
   "send my password",
   "share my personal",
 ];
+
 
 /** Very small local intent matcher — no network, purely mock. */
 export function matchIntent(text: string, allowed: Scenario[]): Scenario | null {
@@ -150,6 +328,8 @@ export type DemoState = {
   blocked: boolean;
   autoplay: boolean;
   clicking: boolean;
+  /** varies the agent's wording between runs */
+  seed: number;
 };
 
 const initial: DemoState = {
@@ -163,6 +343,7 @@ const initial: DemoState = {
   blocked: false,
   autoplay: false,
   clicking: false,
+  seed: 0,
 };
 
 let state: DemoState = { ...initial };
@@ -215,7 +396,7 @@ export const demo = {
     const match = matchIntent(prompt, allowed);
     if (!match) {
       clearTimers();
-      set({ ...initial, panelOpen: true, prompt, unmatched: prompt });
+      set({ ...initial, panelOpen: true, prompt, unmatched: prompt, seed: Math.floor(Math.random() * 1000) });
       return;
     }
     demo.start(match, true, prompt);
@@ -227,6 +408,7 @@ export const demo = {
       panelOpen: true,
       scenario,
       autoplay,
+      seed: Math.floor(Math.random() * 1000),
       prompt: prompt ?? COMMANDS[scenario],
       blocked: scenario === "leak",
     });
