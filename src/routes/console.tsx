@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Check, CheckCircle2, MousePointerClick, ShieldCheck, ShieldAlert } from "lucide-react";
 import { AgentLauncher, AgentPanel } from "@/components/aithos/AgentPanel";
 import { PrivacyFlow } from "@/components/aithos/PrivacyFlow";
-import { COMMANDS, SENSITIVE_FIELDS, demo, useDemo } from "@/lib/aithos-demo";
+import { COMMANDS, SCENARIOS, SENSITIVE_FIELDS, demo, useDemo } from "@/lib/aithos-demo";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/console")({
@@ -50,8 +50,11 @@ function ConsolePage() {
   const active = s.scenario !== null;
   const blocked = s.scenario === "leak";
   const command = s.scenario ? COMMANDS[s.scenario] : "No active request";
-  const protectedCount = !active ? 0 : blocked ? 1 : s.stage >= 1 ? 5 : 0;
-  const detectedCount = !active ? 0 : blocked ? 1 : s.stage >= 1 ? 5 : 0;
+  const cfg = s.scenario && s.scenario !== "leak" ? SCENARIOS[s.scenario] : null;
+  const fields = cfg?.fields ?? SENSITIVE_FIELDS;
+  const count = !active ? 0 : blocked ? 1 : s.stage >= 1 ? fields.length : 0;
+  const protectedCount = count;
+  const detectedCount = count;
 
   return (
     <div className="min-h-screen grid-bg">
@@ -121,7 +124,7 @@ function ConsolePage() {
                 </div>
               </div>
               <ul className="mt-5 grid gap-2 sm:grid-cols-2">
-                {SENSITIVE_FIELDS.map((f) => {
+                {fields.map((f) => {
                   const on = blocked ? f.key === "account" : s.stage >= 1;
                   return (
                     <li
@@ -174,7 +177,9 @@ function ConsolePage() {
                   <div className="inline-flex items-center gap-2 rounded-lg bg-primary/10 px-3 py-1.5 font-mono text-xs text-primary">
                     <MousePointerClick className="size-3.5" /> CLICK
                   </div>
-                  <p className="mt-3 text-sm font-medium">Download Latest Statement</p>
+                  <p className="mt-3 text-sm font-medium">
+                    {cfg?.actionLabel ?? "Download Latest Statement"}
+                  </p>
                   <div className="mt-5">
                     <div className="flex items-center justify-between text-xs text-muted-foreground">
                       <span>Confidence</span>
@@ -216,7 +221,8 @@ function ConsolePage() {
                 </p>
               ) : s.downloaded ? (
                 <div className="flex items-center gap-2 text-sm text-[var(--color-success)]">
-                  <CheckCircle2 className="size-4" /> Statement downloaded ✓
+                  <CheckCircle2 className="size-4" />{" "}
+                  {s.scenario === "flight" ? "Flight booked ✓" : "Statement downloaded ✓"}
                 </div>
               ) : (
                 <p className="text-sm text-muted-foreground">Waiting for the agent to finish.</p>
