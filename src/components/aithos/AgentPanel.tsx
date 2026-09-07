@@ -192,7 +192,7 @@ export function AgentPanel({
               <StageHeader title="Understanding your request..." done={s.stage > 0 || !s.working} />
               {(s.stage > 0 || !s.working) && (
                 <div className="mt-3 space-y-1">
-                  <Row label="User intent" value={COMMANDS.leak} />
+                  <Row label="User intent" value={s.prompt} />
                   <div className="flex items-center gap-2 pt-1 text-sm text-[var(--color-success)]">
                     <Check className="size-4" /> Request understood
                   </div>
