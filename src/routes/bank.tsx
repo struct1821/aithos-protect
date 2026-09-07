@@ -52,7 +52,14 @@ const CUSTOMER = [
 function BankPage() {
   const s = useDemo();
   const [manualDownload, setManualDownload] = useState(false);
-  const downloaded = s.downloaded || manualDownload;
+  const downloaded = (s.downloaded && s.scenario === "statement") || manualDownload;
+  const [manualView, setManualView] = useState<string | null>(null);
+  const done = s.downloaded ? s.scenario : null;
+  const opened =
+    manualView ?? (done === "transactions" ? "transactions" : done === "history" ? "history" : null);
+  const act = (sc: string) => s.clicking && s.scenario === sc;
+  const ring = (sc: string) =>
+    act(sc) ? "scale-[0.97] shadow-[var(--glow-strong)] ring-4 ring-primary/40" : "";
 
   return (
     <div className="min-h-screen bg-background">
@@ -119,21 +126,33 @@ function BankPage() {
                   onClick={() => setManualDownload(true)}
                   className={cn(
                     "relative inline-flex items-center gap-2.5 rounded-xl bg-primary px-6 py-3.5 text-sm font-semibold text-primary-foreground transition-all",
-                    s.clicking
-                      ? "scale-[0.97] shadow-[var(--glow-strong)] ring-4 ring-primary/40"
-                      : "hover:opacity-90",
+                    act("statement") ? ring("statement") : "hover:opacity-90",
                   )}
                 >
-                  {s.clicking && (
+                  {act("statement") && (
                     <span className="absolute -inset-1.5 animate-pulse rounded-2xl ring-2 ring-primary/60" />
                   )}
                   <ArrowDownToLine className="size-4" />
                   Download Latest Statement
                 </button>
-                <button className="inline-flex items-center gap-2 rounded-xl border border-border px-4 py-3 text-sm transition-colors hover:bg-surface-2">
+                <button
+                  id="view-transactions"
+                  onClick={() => setManualView("transactions")}
+                  className={cn(
+                    "inline-flex items-center gap-2 rounded-xl border border-border px-4 py-3 text-sm transition-all hover:bg-surface-2",
+                    ring("transactions"),
+                  )}
+                >
                   <Receipt className="size-4" /> View Transactions
                 </button>
-                <button className="inline-flex items-center gap-2 rounded-xl border border-border px-4 py-3 text-sm transition-colors hover:bg-surface-2">
+                <button
+                  id="view-history"
+                  onClick={() => setManualView("history")}
+                  className={cn(
+                    "inline-flex items-center gap-2 rounded-xl border border-border px-4 py-3 text-sm transition-all hover:bg-surface-2",
+                    ring("history"),
+                  )}
+                >
                   <FileText className="size-4" /> View Statement History
                 </button>
               </div>
@@ -141,6 +160,15 @@ function BankPage() {
               {downloaded && (
                 <div className="animate-rise mt-5 flex items-center gap-2 rounded-xl border border-[color-mix(in_oklab,var(--success)_35%,transparent)] bg-[color-mix(in_oklab,var(--success)_10%,transparent)] px-4 py-3 text-sm text-[var(--color-success)]">
                   <CheckCircle2 className="size-4" /> Statement_September.pdf downloaded
+                </div>
+              )}
+
+              {opened && (
+                <div className="animate-rise mt-5 flex items-center gap-2 rounded-xl border border-[color-mix(in_oklab,var(--success)_35%,transparent)] bg-[color-mix(in_oklab,var(--success)_10%,transparent)] px-4 py-3 text-sm text-[var(--color-success)]">
+                  <CheckCircle2 className="size-4" />{" "}
+                  {opened === "transactions"
+                    ? "Recent transactions opened below"
+                    : "Statement history opened — 12 statements available"}
                 </div>
               )}
             </div>
@@ -172,7 +200,7 @@ function BankPage() {
             <div className="rounded-2xl border border-border bg-surface/60 p-6">
               <div className="flex items-center justify-between">
                 <h2 className="text-base font-semibold">Customer Information</h2>
-                {s.stage >= 2 && s.scenario === "statement" && (
+                {s.stage >= 2 && s.scenario !== "leak" && (
                   <span className="inline-flex items-center gap-1 rounded-full bg-primary/12 px-2.5 py-1 text-[10px] font-medium text-primary">
                     <ShieldCheck className="size-3" /> Protected
                   </span>
@@ -185,7 +213,7 @@ function BankPage() {
                     <dd
                       className={cn(
                         "mt-0.5 text-sm transition-all duration-500",
-                        s.stage >= 2 && s.scenario === "statement" &&
+                        s.stage >= 2 && s.scenario !== "leak" &&
                           "rounded bg-primary/10 px-1.5 py-0.5 text-primary blur-[0.2px]",
                       )}
                     >
@@ -204,7 +232,7 @@ function BankPage() {
         </div>
       </main>
 
-      <AgentPanel />
+      <AgentPanel scenarios={["statement", "transactions", "history", "leak"]} />
       <AgentLauncher />
     </div>
   );

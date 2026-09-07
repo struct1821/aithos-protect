@@ -36,7 +36,9 @@ function TravelPage() {
   const s = useDemo();
   const [manual, setManual] = useState(false);
   const booked = (s.downloaded && s.scenario === "flight") || manual;
-  const protecting = s.scenario === "flight" && s.stage >= 2;
+  const [seatManual, setSeatManual] = useState(false);
+  const seatDone = (s.downloaded && s.scenario === "seats") || seatManual;
+  const protecting = s.scenario !== "leak" && s.scenario !== null && s.stage >= 2;
 
   return (
     <div className="min-h-screen bg-background">
@@ -164,7 +166,15 @@ function TravelPage() {
                   <Ticket className="size-4" />
                   Confirm Booking
                 </button>
-                <button className="inline-flex items-center gap-2 rounded-xl border border-border px-4 py-3 text-sm transition-colors hover:bg-surface-2">
+                <button
+                  id="change-seats"
+                  onClick={() => setSeatManual(true)}
+                  className={cn(
+                    "inline-flex items-center gap-2 rounded-xl border border-border px-4 py-3 text-sm transition-all hover:bg-surface-2",
+                    s.clicking && s.scenario === "seats" &&
+                      "scale-[0.97] shadow-[var(--glow-strong)] ring-4 ring-primary/40",
+                  )}
+                >
                   Change seats
                 </button>
               </div>
@@ -173,6 +183,12 @@ function TravelPage() {
                 <div className="animate-rise mt-5 flex items-center gap-2 rounded-xl border border-[color-mix(in_oklab,var(--success)_35%,transparent)] bg-[color-mix(in_oklab,var(--success)_10%,transparent)] px-4 py-3 text-sm text-[var(--color-success)]">
                   <CheckCircle2 className="size-4" /> Booking confirmed — SkyWays SW 214, PNR
                   QJ7T2M
+                </div>
+              )}
+
+              {seatDone && (
+                <div className="animate-rise mt-5 flex items-center gap-2 rounded-xl border border-[color-mix(in_oklab,var(--success)_35%,transparent)] bg-[color-mix(in_oklab,var(--success)_10%,transparent)] px-4 py-3 text-sm text-[var(--color-success)]">
+                  <CheckCircle2 className="size-4" /> Seat updated — 12A, window
                 </div>
               )}
             </div>
@@ -203,7 +219,7 @@ function TravelPage() {
         </div>
       </main>
 
-      <AgentPanel scenarios={["flight", "leak"]} />
+      <AgentPanel scenarios={["flight", "seats", "leak"]} />
       <AgentLauncher />
     </div>
   );
