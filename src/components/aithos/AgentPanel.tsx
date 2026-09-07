@@ -135,7 +135,7 @@ export function AgentPanel({
         {s.stage < 0 && (
           <div className="space-y-4">
             <p className="text-sm text-muted-foreground">
-              What would you like me to do?
+              Type what you'd like me to do on this page.
             </p>
             <div className="space-y-2">
               {scenarios.map((sc) => {
@@ -161,11 +161,29 @@ export function AgentPanel({
                 );
               })}
             </div>
-            <p className="text-xs text-muted-foreground">
-              Pick a suggested command to run the demonstration.
-            </p>
+            {s.unmatched ? (
+              <div className="space-y-2">
+                <div className="ml-auto w-fit max-w-[85%] rounded-2xl rounded-br-sm bg-primary/15 px-3.5 py-2 text-sm text-primary">
+                  {s.unmatched}
+                </div>
+                <div className="w-fit max-w-[90%] rounded-2xl rounded-bl-sm bg-surface-2 px-3.5 py-2 text-sm text-muted-foreground">
+                  I can't find an action for that on this page. Try one of the requests above.
+                </div>
+              </div>
+            ) : (
+              <p className="text-xs text-muted-foreground">
+                Or tap a suggestion to run it instantly.
+              </p>
+            )}
           </div>
         )}
+
+        {s.stage >= 0 && (
+          <div className="ml-auto w-fit max-w-[85%] rounded-2xl rounded-br-sm bg-primary/15 px-3.5 py-2 text-sm text-primary">
+            {s.prompt}
+          </div>
+        )}
+
 
         {/* BLOCKED SCENARIO */}
         {s.scenario === "leak" && s.stage >= 0 && (
