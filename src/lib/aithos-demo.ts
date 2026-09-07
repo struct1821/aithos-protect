@@ -6,7 +6,7 @@ import { useSyncExternalStore } from "react";
  * the scripted transitions below without changing the UI layer.
  */
 
-export type Scenario = "statement" | "leak";
+export type Scenario = "statement" | "flight" | "leak";
 
 export const SENSITIVE_FIELDS = [
   { key: "name", label: "Name", raw: "Rahul Sharma", token: "[NAME]" },
