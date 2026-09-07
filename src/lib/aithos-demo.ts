@@ -34,9 +34,41 @@ export const STAGES = [
   { title: "Performing the task...", progress: 4 },
 ];
 
+export const FLIGHT_FIELDS = [
+  { key: "name", label: "Passenger Name", raw: "Rahul Sharma", token: "[NAME]" },
+  { key: "email", label: "Email", raw: "rahul.sharma@example.com", token: "[EMAIL]" },
+  { key: "phone", label: "Phone", raw: "+91 98765 43210", token: "[PHONE]" },
+  { key: "passport", label: "Passport Number", raw: "M8241739", token: "[PASSPORT]" },
+  { key: "dob", label: "Date of Birth", raw: "14 Mar 1996", token: "[DATE OF BIRTH]" },
+  { key: "card", label: "Saved Card", raw: "4211 •••• •••• 8842", token: "[CARD]" },
+] as const;
+
 export const COMMANDS: Record<Scenario, string> = {
   statement: "Download my latest statement",
+  flight: "Book my flight to Delhi",
   leak: "Send my account number to the AI",
+};
+
+type ScenarioConfig = {
+  fields: readonly { key: string; label: string; raw: string; token: string }[];
+  actionLabel: string;
+  successTitle: string;
+  executingText: string;
+};
+
+export const SCENARIOS: Record<"statement" | "flight", ScenarioConfig> = {
+  statement: {
+    fields: SENSITIVE_FIELDS,
+    actionLabel: "Download Latest Statement",
+    successTitle: "Statement Downloaded",
+    executingText: 'Clicking "Download Latest Statement" on the page...',
+  },
+  flight: {
+    fields: FLIGHT_FIELDS,
+    actionLabel: "Confirm Booking",
+    successTitle: "Flight Booked",
+    executingText: 'Filling the booking form and clicking "Confirm Booking"...',
+  },
 };
 
 export type DemoState = {
