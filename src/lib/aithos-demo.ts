@@ -209,13 +209,25 @@ export const demo = {
     clearTimers();
     set({ ...initial, panelOpen: state.panelOpen });
   },
-  start(scenario: Scenario, autoplay = true) {
+  submit(text: string, allowed: Scenario[]) {
+    const prompt = text.trim();
+    if (!prompt) return;
+    const match = matchIntent(prompt, allowed);
+    if (!match) {
+      clearTimers();
+      set({ ...initial, panelOpen: true, prompt, unmatched: prompt });
+      return;
+    }
+    demo.start(match, true, prompt);
+  },
+  start(scenario: Scenario, autoplay = true, prompt?: string) {
     clearTimers();
     set({
       ...initial,
       panelOpen: true,
       scenario,
       autoplay,
+      prompt: prompt ?? COMMANDS[scenario],
       blocked: scenario === "leak",
     });
     if (scenario === "leak") {
