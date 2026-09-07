@@ -64,6 +64,13 @@ export function AgentPanel({
 }) {
   const s = useDemo();
   const scrollRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [draft, setDraft] = useState("");
+
+  useEffect(() => {
+    if (s.panelOpen) inputRef.current?.focus();
+  }, [s.panelOpen, s.stage]);
+
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
