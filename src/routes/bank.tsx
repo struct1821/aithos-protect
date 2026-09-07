@@ -51,6 +51,7 @@ const CUSTOMER = [
 
 function BankPage() {
   const s = useDemo();
+  const protecting = s.scenario !== null && s.scenario !== "leak" && s.stage >= 2;
   const [manualDownload, setManualDownload] = useState(false);
   const downloaded = (s.downloaded && s.scenario === "statement") || manualDownload;
   const [manualView, setManualView] = useState<string | null>(null);
@@ -113,7 +114,14 @@ function BankPage() {
                   </div>
                   <div className="mt-2 font-display text-4xl font-bold">₹1,24,560.00</div>
                   <div className="mt-4 text-xs text-muted-foreground">Account Number</div>
-                  <div className="font-mono text-sm">123456789012</div>
+                  <div
+                    className={cn(
+                      "font-mono text-sm transition-all duration-500",
+                      protecting && "w-fit rounded bg-primary/10 px-1.5 py-0.5 text-primary",
+                    )}
+                  >
+                    {protecting ? "[ACCOUNT NUMBER]" : "123456789012"}
+                  </div>
                 </div>
                 <span className="flex size-11 items-center justify-center rounded-xl bg-primary/12 text-primary ring-1 ring-primary/25">
                   <Building2 className="size-5" />
@@ -212,12 +220,12 @@ function BankPage() {
                     <dt className="text-xs text-muted-foreground">{c.label}</dt>
                     <dd
                       className={cn(
-                        "mt-0.5 text-sm transition-all duration-500",
-                        s.stage >= 2 && s.scenario !== "leak" &&
-                          "rounded bg-primary/10 px-1.5 py-0.5 text-primary blur-[0.2px]",
+                        "mt-0.5 w-fit text-sm transition-all duration-500",
+                        protecting &&
+                          "rounded bg-primary/10 px-1.5 py-0.5 font-mono text-primary",
                       )}
                     >
-                      {c.value}
+                      {protecting ? c.token : c.value}
                     </dd>
                   </div>
                 ))}
