@@ -14,7 +14,7 @@ import {
   Sparkles,
   X,
 } from "lucide-react";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   COMMANDS,
   SCENARIOS,
@@ -64,6 +64,13 @@ export function AgentPanel({
 }) {
   const s = useDemo();
   const scrollRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [draft, setDraft] = useState("");
+
+  useEffect(() => {
+    if (s.panelOpen) inputRef.current?.focus();
+  }, [s.panelOpen, s.stage]);
+
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
@@ -135,7 +142,7 @@ export function AgentPanel({
         {s.stage < 0 && (
           <div className="space-y-4">
             <p className="text-sm text-muted-foreground">
-              What would you like me to do?
+              Type what you'd like me to do on this page.
             </p>
             <div className="space-y-2">
               {scenarios.map((sc) => {
@@ -161,11 +168,29 @@ export function AgentPanel({
                 );
               })}
             </div>
-            <p className="text-xs text-muted-foreground">
-              Pick a suggested command to run the demonstration.
-            </p>
+            {s.unmatched ? (
+              <div className="space-y-2">
+                <div className="ml-auto w-fit max-w-[85%] rounded-2xl rounded-br-sm bg-primary/15 px-3.5 py-2 text-sm text-primary">
+                  {s.unmatched}
+                </div>
+                <div className="w-fit max-w-[90%] rounded-2xl rounded-bl-sm bg-surface-2 px-3.5 py-2 text-sm text-muted-foreground">
+                  I can't find an action for that on this page. Try one of the requests above.
+                </div>
+              </div>
+            ) : (
+              <p className="text-xs text-muted-foreground">
+                Or tap a suggestion to run it instantly.
+              </p>
+            )}
           </div>
         )}
+
+        {s.stage >= 0 && (
+          <div className="ml-auto w-fit max-w-[85%] rounded-2xl rounded-br-sm bg-primary/15 px-3.5 py-2 text-sm text-primary">
+            {s.prompt}
+          </div>
+        )}
+
 
         {/* BLOCKED SCENARIO */}
         {s.scenario === "leak" && s.stage >= 0 && (
@@ -174,7 +199,7 @@ export function AgentPanel({
               <StageHeader title="Understanding your request..." done={s.stage > 0 || !s.working} />
               {(s.stage > 0 || !s.working) && (
                 <div className="mt-3 space-y-1">
-                  <Row label="User intent" value={COMMANDS.leak} />
+                  <Row label="User intent" value={s.prompt} />
                   <div className="flex items-center gap-2 pt-1 text-sm text-[var(--color-success)]">
                     <Check className="size-4" /> Request understood
                   </div>
@@ -217,7 +242,7 @@ export function AgentPanel({
               <StageHeader title={STAGES[0]!.title} done={s.stage > 0 || !s.working} />
               {(s.stage > 0 || !s.working) && (
                 <div className="mt-3 space-y-1">
-                  <Row label="User intent" value={COMMANDS[s.scenario!]} />
+                  <Row label="User intent" value={s.prompt} />
                   <div className="flex items-center gap-2 pt-1 text-sm text-[var(--color-success)]">
                     <Check className="size-4" /> Request understood
                   </div>
@@ -304,7 +329,7 @@ export function AgentPanel({
                 <StageHeader title={STAGES[3]!.title} done={s.stage > 3 || !s.working} />
                 {(s.stage > 3 || !s.working) && (
                   <div className="mt-3 space-y-1">
-                    <Row label="User request" value={COMMANDS[s.scenario!]} />
+                    <Row label="User request" value={s.prompt} />
                     <Row label="Available page action" value={cfg.actionLabel} />
                     <div className="mt-2 flex items-center gap-2 rounded-lg bg-primary/10 px-3 py-2 font-mono text-xs text-primary">
                       <MousePointerClick className="size-4" />
@@ -375,7 +400,7 @@ export function AgentPanel({
 
       {/* controls */}
       {s.stage >= 0 && (
-        <div className="flex items-center justify-between gap-2 border-t border-border bg-background/60 px-5 py-3">
+        <div className="flex items-center justify-between gap-2 border-t border-border bg-background/60 px-5 py-2.5">
           <button
             onClick={demo.back}
             disabled={s.stage <= 0}
@@ -387,7 +412,7 @@ export function AgentPanel({
             onClick={demo.restart}
             className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs text-muted-foreground transition-colors hover:text-foreground"
           >
-            <RotateCcw className="size-3.5" /> Restart Demo
+            <RotateCcw className="size-3.5" /> Restart
           </button>
           <button
             onClick={demo.next}
@@ -398,6 +423,34 @@ export function AgentPanel({
           </button>
         </div>
       )}
+
+      {/* composer */}
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          demo.submit(draft, scenarios);
+          setDraft("");
+          inputRef.current?.focus();
+        }}
+        className="flex items-center gap-2 border-t border-border bg-background/70 px-4 py-3"
+      >
+        <input
+          ref={inputRef}
+          value={draft}
+          onChange={(e) => setDraft(e.target.value)}
+          placeholder="Ask AITHOS to do something on this page..."
+          className="min-w-0 flex-1 rounded-xl border border-border bg-surface/70 px-3.5 py-2.5 text-sm outline-none transition-colors placeholder:text-muted-foreground focus:border-primary/50"
+        />
+        <button
+          type="submit"
+          disabled={!draft.trim()}
+          aria-label="Send request"
+          className="inline-flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary text-primary-foreground transition-opacity hover:opacity-90 disabled:opacity-35"
+        >
+          <Send className="size-4" />
+        </button>
+      </form>
+
     </div>
   );
 }
