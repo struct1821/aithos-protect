@@ -328,6 +328,8 @@ export type DemoState = {
   blocked: boolean;
   autoplay: boolean;
   clicking: boolean;
+  /** varies the agent's wording between runs */
+  seed: number;
 };
 
 const initial: DemoState = {
@@ -341,6 +343,7 @@ const initial: DemoState = {
   blocked: false,
   autoplay: false,
   clicking: false,
+  seed: 0,
 };
 
 let state: DemoState = { ...initial };
@@ -393,7 +396,7 @@ export const demo = {
     const match = matchIntent(prompt, allowed);
     if (!match) {
       clearTimers();
-      set({ ...initial, panelOpen: true, prompt, unmatched: prompt });
+      set({ ...initial, panelOpen: true, prompt, unmatched: prompt, seed: Math.floor(Math.random() * 1000) });
       return;
     }
     demo.start(match, true, prompt);
@@ -405,6 +408,7 @@ export const demo = {
       panelOpen: true,
       scenario,
       autoplay,
+      seed: Math.floor(Math.random() * 1000),
       prompt: prompt ?? COMMANDS[scenario],
       blocked: scenario === "leak",
     });
