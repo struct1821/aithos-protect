@@ -51,7 +51,10 @@ export const FLIGHT_FIELDS = [
 
 export const COMMANDS: Record<Scenario, string> = {
   statement: "Download my latest statement",
+  transactions: "Show me my recent transactions",
+  history: "Open my statement history",
   flight: "Book my flight to Delhi",
+  seats: "Change my seat for this flight",
   leak: "Send my account number to the AI",
 };
 
@@ -60,26 +63,85 @@ type ScenarioConfig = {
   actionLabel: string;
   successTitle: string;
   executingText: string;
+  /** keywords used to match a typed prompt to this task */
+  keywords: string[];
 };
 
-export const SCENARIOS: Record<"statement" | "flight", ScenarioConfig> = {
+export const SCENARIOS: Record<Exclude<Scenario, "leak">, ScenarioConfig> = {
   statement: {
     fields: SENSITIVE_FIELDS,
     actionLabel: "Download Latest Statement",
     successTitle: "Statement Downloaded",
     executingText: 'Clicking "Download Latest Statement" on the page...',
+    keywords: ["download", "statement", "pdf", "bank statement", "latest statement"],
+  },
+  transactions: {
+    fields: SENSITIVE_FIELDS,
+    actionLabel: "View Transactions",
+    successTitle: "Transactions Opened",
+    executingText: 'Clicking "View Transactions" on the page...',
+    keywords: ["transaction", "transactions", "spending", "recent activity", "payments"],
+  },
+  history: {
+    fields: SENSITIVE_FIELDS,
+    actionLabel: "View Statement History",
+    successTitle: "Statement History Opened",
+    executingText: 'Clicking "View Statement History" on the page...',
+    keywords: ["history", "past statements", "older statements", "statement history"],
   },
   flight: {
     fields: FLIGHT_FIELDS,
     actionLabel: "Confirm Booking",
     successTitle: "Flight Booked",
     executingText: 'Filling the booking form and clicking "Confirm Booking"...',
+    keywords: ["book", "booking", "flight", "ticket", "confirm", "delhi"],
+  },
+  seats: {
+    fields: FLIGHT_FIELDS,
+    actionLabel: "Change seats",
+    successTitle: "Seat Updated",
+    executingText: 'Clicking "Change seats" and picking a window seat...',
+    keywords: ["seat", "seats", "window", "aisle"],
   },
 };
+
+const LEAK_KEYWORDS = [
+  "send my account",
+  "share my account",
+  "give the ai",
+  "send my pan",
+  "share my pan",
+  "send my card",
+  "share my card",
+  "send my passport",
+  "share my passport",
+  "tell the ai my",
+  "send my password",
+  "share my personal",
+];
+
+/** Very small local intent matcher — no network, purely mock. */
+export function matchIntent(text: string, allowed: Scenario[]): Scenario | null {
+  const t = text.toLowerCase();
+  if (LEAK_KEYWORDS.some((k) => t.includes(k)) && allowed.includes("leak")) return "leak";
+  let best: { scenario: Scenario; score: number } | null = null;
+  for (const sc of allowed) {
+    if (sc === "leak") continue;
+    const cfg = SCENARIOS[sc as Exclude<Scenario, "leak">];
+    if (!cfg) continue;
+    const score = cfg.keywords.reduce((n, k) => (t.includes(k) ? n + k.length : n), 0);
+    if (score > 0 && (!best || score > best.score)) best = { scenario: sc, score };
+  }
+  return best?.scenario ?? null;
+}
 
 export type DemoState = {
   panelOpen: boolean;
   scenario: Scenario | null;
+  /** what the user actually typed */
+  prompt: string;
+  /** set when the typed prompt matched no available task */
+  unmatched: string | null;
   /** -1 = idle, 0..5 = stage index */
   stage: number;
   /** stage is still "working" vs resolved */
@@ -93,6 +155,8 @@ export type DemoState = {
 const initial: DemoState = {
   panelOpen: false,
   scenario: null,
+  prompt: "",
+  unmatched: null,
   stage: -1,
   working: false,
   downloaded: false,
