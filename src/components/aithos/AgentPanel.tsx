@@ -7,6 +7,9 @@ import {
   Gauge,
   MousePointerClick,
   RotateCcw,
+  Cloud,
+  Cpu,
+  Lock,
   ScanLine,
   Send,
   ShieldAlert,
@@ -18,7 +21,10 @@ import { useEffect, useRef, useState } from "react";
 import {
   COMMANDS,
   SCENARIOS,
+  CLOUD_WORK,
+  LOCAL_WORK,
   agentLine,
+  cloudRequestText,
   noMatchLine,
   STAGES,
   STEP_LABELS,
@@ -370,10 +376,44 @@ export function AgentPanel({
             {s.stage >= 3 && (
               <Card>
                 <StageHeader title={STAGES[3]!.title} done={s.stage > 3 || !s.working} />
+                <div className="mt-3 grid gap-2 sm:grid-cols-2">
+                  <div className="rounded-lg border border-primary/30 bg-primary/8 p-3">
+                    <div className="flex items-center gap-1.5 text-xs font-semibold text-primary">
+                      <Cpu className="size-3.5" /> On-device AITHOS
+                    </div>
+                    <ul className="mt-2 space-y-1 text-[11px] text-muted-foreground">
+                      {LOCAL_WORK.map((w) => (
+                        <li key={w} className="flex gap-1.5">
+                          <Lock className="mt-0.5 size-3 shrink-0 text-primary" />
+                          {w}
+                        </li>
+                      ))}
+                    </ul>
+                    <div className="mt-2 text-[11px] font-medium text-[var(--color-success)]">
+                      Personal information never leaves here
+                    </div>
+                  </div>
+                  <div className="rounded-lg border border-border bg-background/50 p-3">
+                    <div className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground">
+                      <Cloud className="size-3.5" /> Cloud AI
+                    </div>
+                    <ul className="mt-2 space-y-1 text-[11px] text-muted-foreground">
+                      {CLOUD_WORK.map((w) => (
+                        <li key={w}>• {w}</li>
+                      ))}
+                    </ul>
+                    <div className="mt-2 rounded bg-surface-2 p-2 font-mono text-[10px] leading-relaxed whitespace-pre-wrap text-muted-foreground">
+                      {cloudRequestText(s.prompt, fields, [cfg.actionLabel])}
+                    </div>
+                    <div className="mt-2 text-[11px] text-muted-foreground">
+                      Sees tokens only — no real values
+                    </div>
+                  </div>
+                </div>
                 {(s.stage > 3 || !s.working) && (
                   <div className="mt-3 space-y-1">
-                    <Row label="User request" value={s.prompt} />
-                    <Row label="Available page action" value={cfg.actionLabel} />
+                    <Row label="Cloud suggestion" value={cfg.actionLabel} />
+                    <Row label="Executed locally by" value="AITHOS on-device engine" />
                     <div className="mt-2 flex items-center gap-2 rounded-lg bg-primary/10 px-3 py-2 font-mono text-xs text-primary">
                       <MousePointerClick className="size-4" />
                       → CLICK "{cfg.actionLabel}"
