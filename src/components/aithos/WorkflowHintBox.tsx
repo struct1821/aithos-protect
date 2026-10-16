@@ -5,12 +5,13 @@ import {
   getCurrentSteps,
 } from "@/lib/workflow-guide";
 import {
-  Lightbulb,
+  Sparkles,
   X,
   ChevronRight,
   ChevronLeft,
   Play,
   ShieldCheck,
+  Compass,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Link } from "@tanstack/react-router";
@@ -29,8 +30,8 @@ export function WorkflowHintBox() {
           onClick={() => workflowGuide.setActive(true)}
           className="group flex items-center gap-2 rounded-full border border-primary/30 bg-surface/90 px-3.5 py-1.5 text-xs font-medium text-primary shadow-lg backdrop-blur-md transition-all hover:scale-105 hover:bg-primary hover:text-primary-foreground"
         >
-          <Lightbulb className="size-3.5" />
-          <span>Show Hints</span>
+          <Compass className="size-3.5" />
+          <span>Guide</span>
         </button>
       </div>
     );
@@ -44,8 +45,8 @@ export function WorkflowHintBox() {
           className="flex items-center gap-2 rounded-full border border-primary/40 bg-surface/95 px-3.5 py-1.5 text-xs font-semibold text-foreground shadow-xl backdrop-blur-xl transition-all hover:border-primary hover:scale-105"
         >
           <span className="flex size-2 rounded-full bg-primary animate-ping" />
-          <Lightbulb className="size-3.5 text-primary" />
-          <span>Hint: {currentStep?.title || "Next Step"}</span>
+          <Sparkles className="size-3.5 text-primary" />
+          <span>{currentStep?.title || "Guide"}</span>
         </button>
       </div>
     );
@@ -54,31 +55,31 @@ export function WorkflowHintBox() {
   return (
     <div
       role="dialog"
-      aria-label="Workflow Hint"
+      aria-label="Workflow Guide"
       className="fixed top-20 right-6 z-40 w-[340px] max-w-[calc(100vw-2rem)] rounded-2xl border border-primary/30 bg-surface/95 p-4 shadow-2xl backdrop-blur-xl animate-rise"
     >
       {/* Top Header */}
       <div className="flex items-center justify-between border-b border-border/70 pb-2.5">
         <div className="flex items-center gap-2">
           <span className="flex size-5 items-center justify-center rounded-md bg-primary/15 text-primary">
-            <Lightbulb className="size-3.5" />
+            <Sparkles className="size-3.5" />
           </span>
           <span className="text-xs font-bold tracking-wide text-foreground uppercase">
-            Hint • Step {guide.stepIndex + 1}/{steps.length}
+            Guide • Step {guide.stepIndex + 1} of {steps.length}
           </span>
         </div>
 
         <div className="flex items-center gap-1">
           <button
             onClick={() => setMinimized(true)}
-            aria-label="Minimize hint"
+            aria-label="Minimize popup"
             className="rounded p-1 text-[11px] text-muted-foreground hover:bg-surface-2 hover:text-foreground transition-colors"
           >
             Minimize
           </button>
           <button
             onClick={() => workflowGuide.setActive(false)}
-            aria-label="Close hints"
+            aria-label="Close guide popup"
             className="rounded p-1 text-muted-foreground hover:bg-surface-2 hover:text-foreground transition-colors"
           >
             <X className="size-3.5" />
@@ -164,7 +165,7 @@ export function WorkflowHintBox() {
             onClick={workflowGuide.prevStep}
             disabled={guide.stepIndex === 0}
             className="rounded-lg p-1 text-muted-foreground hover:bg-surface-2 hover:text-foreground disabled:opacity-20 transition-colors"
-            title="Previous hint"
+            title="Previous step"
           >
             <ChevronLeft className="size-4" />
           </button>
@@ -175,7 +176,7 @@ export function WorkflowHintBox() {
             onClick={workflowGuide.nextStep}
             disabled={guide.stepIndex === steps.length - 1}
             className="rounded-lg p-1 text-muted-foreground hover:bg-surface-2 hover:text-foreground disabled:opacity-20 transition-colors"
-            title="Next hint"
+            title="Next step"
           >
             <ChevronRight className="size-4" />
           </button>

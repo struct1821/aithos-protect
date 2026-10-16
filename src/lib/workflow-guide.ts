@@ -22,10 +22,10 @@ export const BANKING_STEPS: GuideStep[] = [
     targetId: "agent-launcher-btn",
     page: "/bank",
     title: "1. Open AITHOS Agent",
-    subtitle: "Initialize local on-device privacy engine",
-    whatToDo: "Click the cyan 'AITHOS Agent' button in the bottom right corner.",
+    subtitle: "Or click 'Download Latest Statement' directly",
+    whatToDo: "Click the cyan 'AITHOS Agent' button in the bottom right, OR click 'Download Latest Statement' on the page.",
     whatHappensAfter:
-      "The AITHOS agent panel slides up. It initializes its on-device sandbox directly in your browser. No data leaves your machine.",
+      "AITHOS intercepts browser events locally. Sensitive customer identifiers stay strictly protected in your local browser sandbox.",
     actionLabel: "Open Agent Panel",
     action: () => demo.openPanel(),
   },
@@ -35,7 +35,7 @@ export const BANKING_STEPS: GuideStep[] = [
     page: "/bank",
     title: "2. Ask the Agent to Act",
     subtitle: "Select a task or enter custom instruction",
-    whatToDo: "Click 'Download my latest statement' or type a command in the input box.",
+    whatToDo: "Click 'Download my latest statement' in the suggestions, or click 'Download Latest Statement' on the page.",
     whatHappensAfter:
       "AITHOS intercepts the request locally. It scans the current webpage DOM to identify both interactive buttons and personal data fields before touching the network.",
     actionLabel: "Select 'Download statement'",
@@ -49,8 +49,8 @@ export const BANKING_STEPS: GuideStep[] = [
     targetId: "customer-info-card",
     page: "/bank",
     title: "3. On-Device PII Redaction",
-    subtitle: "Detect and mask personal identifiers",
-    whatToDo: "Observe the customer info on the page and in the panel turning into protected tokens. Click 'Next' in the panel.",
+    subtitle: "Observe live animated redaction on the page",
+    whatToDo: "Notice the customer info card actively highlighting and masking Rahul's name, email, phone, and PAN with safe placeholder tokens.",
     whatHappensAfter:
       "All sensitive items (Rahul Sharma, 123456789012, PAN, email) are replaced with synthetic placeholders like [ACCOUNT NUMBER]. Zero identity details leave your computer.",
     actionLabel: "Advance to Safe Context",
@@ -108,11 +108,11 @@ export const BANKING_STEPS: GuideStep[] = [
     id: "execute-action",
     targetId: "download-statement",
     page: "/bank",
-    title: "7. Safe Local Execution",
-    subtitle: "The agent clicks the button locally",
-    whatToDo: "Watch the 'Download Latest Statement' button get triggered on the banking page.",
+    title: "7. Safe Execution",
+    subtitle: "Click the statement button or let agent click it",
+    whatToDo: "Click 'Download Latest Statement' on the page, or let the agent trigger it.",
     whatHappensAfter:
-      "AITHOS executes the click directly in your browser. Statement_September.pdf is downloaded, and an audit trail is recorded locally with 0 data leaks.",
+      "The browser safely processes the download. Statement_September.pdf is downloaded locally with 0 data leaks.",
     actionLabel: "Trigger Execution",
     action: () => {
       demo.openPanel();
@@ -125,9 +125,9 @@ export const BANKING_STEPS: GuideStep[] = [
     page: "/bank",
     title: "8. Inspect Privacy Console",
     subtitle: "Verify cryptographic zero-leak audit",
-    whatToDo: "Click 'Privacy Console' in the top header or panel to view the complete audit log.",
+    whatToDo: "Task completed! Click 'Privacy Console' in the top header to inspect the complete zero-leak audit trail.",
     whatHappensAfter:
-      "The console reveals transparent metrics: 0 raw personal items shared, complete split-compute breakdown, and an immutable log of everything that happened.",
+      "The console reveals transparent metrics: 0 raw personal items shared, complete split-compute breakdown, and an immutable log.",
     actionLabel: "Go to Privacy Console",
     action: () => {
       if (typeof window !== "undefined") {
@@ -143,10 +143,10 @@ export const FLIGHT_STEPS: GuideStep[] = [
     targetId: "agent-launcher-btn",
     page: "/travel",
     title: "1. Open Flight Booking Agent",
-    subtitle: "Book travel with synthetic traveller data",
-    whatToDo: "Click the 'AITHOS Agent' button on the SkyWays travel page.",
+    subtitle: "Or click 'Confirm Booking' directly",
+    whatToDo: "Click the cyan 'AITHOS Agent' button, OR click 'Confirm Booking' directly on the flight page.",
     whatHappensAfter:
-      "The agent activates its travel privacy sandbox. Passport number, DOB, and saved card details on screen will remain local only.",
+      "The agent activates its travel privacy sandbox. Passport number, DOB, and saved card details on screen remain local only.",
     actionLabel: "Open Agent",
     action: () => demo.openPanel(),
   },
@@ -156,7 +156,7 @@ export const FLIGHT_STEPS: GuideStep[] = [
     page: "/travel",
     title: "2. Request Flight Booking",
     subtitle: "Select 'Book my flight to Delhi'",
-    whatToDo: "Click 'Book my flight to Delhi' in the suggestions list.",
+    whatToDo: "Click 'Book my flight to Delhi' in the suggestions list, or click 'Confirm Booking' on the page.",
     whatHappensAfter:
       "AITHOS scans the flight list and passenger form. It identifies sensitive fields (Passport, Card, DOB) and prepares local tokens.",
     actionLabel: "Start Booking Flow",
@@ -184,15 +184,31 @@ export const FLIGHT_STEPS: GuideStep[] = [
     id: "flight-execute",
     targetId: "confirm-booking-btn",
     page: "/travel",
-    title: "4. Autonomous Booking Execution",
-    subtitle: "Agent completes checkout locally",
-    whatToDo: "Click 'Next' until the booking is confirmed on the airline page.",
+    title: "4. Confirm Flight Booking",
+    subtitle: "Agent or manual checkout",
+    whatToDo: "Click 'Confirm Booking' on the page or advance the agent panel.",
     whatHappensAfter:
-      "AITHOS re-injects the real details locally at submission time and clicks 'Confirm Booking'. Your ticket is booked without exposing your details to cloud AI.",
+      "AITHOS re-injects the real details locally at submission time. Your ticket is booked without exposing your details to cloud AI.",
     actionLabel: "Confirm Booking",
     action: () => {
       demo.openPanel();
       demo.next();
+    },
+  },
+  {
+    id: "flight-console",
+    targetId: "nav-privacy-console",
+    page: "/travel",
+    title: "5. Inspect Privacy Console",
+    subtitle: "Verify zero data was leaked",
+    whatToDo: "Booking completed! Click 'Privacy Console' in the top header to view the zero-leak audit log.",
+    whatHappensAfter:
+      "See cryptographic proof that 0 bytes of sensitive passport or card credentials left your device during the flight booking.",
+    actionLabel: "Go to Privacy Console",
+    action: () => {
+      if (typeof window !== "undefined") {
+        window.location.href = "/console";
+      }
     },
   },
 ];
@@ -234,7 +250,7 @@ type WorkflowState = {
 };
 
 const initialState: WorkflowState = {
-  active: true, // Enabled by default so the user immediately gets guided
+  active: true,
   scenario: "banking",
   stepIndex: 0,
   highlightedTarget: "agent-launcher-btn",
@@ -317,39 +333,81 @@ export const workflowGuide = {
     state.expandedExplanation = !state.expandedExplanation;
     emit();
   },
-  syncWithDemoStage: (stage: number, scenario: string | null, panelOpen: boolean) => {
+  syncState: (params: {
+    stage: number;
+    scenario: string | null;
+    panelOpen: boolean;
+    completed?: boolean;
+    page?: string;
+  }) => {
     if (!state.active) return;
-    if (!panelOpen) {
-      if (state.stepIndex !== 0) {
-        state.stepIndex = 0;
-        state.highlightedTarget = "agent-launcher-btn";
-        emit();
+
+    // 1. If task was completed (either manually on the page or through agent)
+    if (params.completed) {
+      if (state.scenario === "flight" || params.scenario === "flight") {
+        if (state.scenario !== "flight") state.scenario = "flight";
+        if (state.stepIndex !== 4) {
+          state.stepIndex = 4; // Step 5: Inspect Privacy Console
+          state.highlightedTarget = "nav-privacy-console";
+          emit();
+        }
+      } else {
+        if (state.scenario !== "banking") state.scenario = "banking";
+        if (state.stepIndex !== 7) {
+          state.stepIndex = 7; // Step 8: Inspect Privacy Console
+          state.highlightedTarget = "nav-privacy-console";
+          emit();
+        }
       }
       return;
     }
-    if (scenario === "leak") {
+
+    // 2. If leak test scenario
+    if (params.scenario === "leak") {
       if (state.scenario !== "leak") {
         state.scenario = "leak";
+      }
+      if (state.stepIndex !== 1) {
         state.stepIndex = 1;
         state.highlightedTarget = "agent-panel-content";
         emit();
       }
       return;
     }
-    if (stage < 0) {
-      state.stepIndex = 1;
-      state.highlightedTarget = "agent-prompt-suggestions";
-      emit();
+
+    // 3. If panel is closed
+    if (!params.panelOpen) {
+      // Don't reset if user has completed the task
+      const isBankDone = state.scenario === "banking" && state.stepIndex === 7;
+      const isFlightDone = state.scenario === "flight" && state.stepIndex === 4;
+      if (!isBankDone && !isFlightDone) {
+        if (state.stepIndex !== 0) {
+          state.stepIndex = 0;
+          state.highlightedTarget = "agent-launcher-btn";
+          emit();
+        }
+      }
       return;
     }
-    // Mapping demo stage (0..5) to guide step in flight flow
-    if (state.scenario === "flight" || scenario === "flight") {
+
+    // 4. If panel is open and idle (suggestions ready)
+    if (params.stage < 0) {
+      if (state.stepIndex !== 1) {
+        state.stepIndex = 1;
+        state.highlightedTarget = "agent-prompt-suggestions";
+        emit();
+      }
+      return;
+    }
+
+    // 5. If panel is open and running flight flow
+    if (state.scenario === "flight" || params.scenario === "flight") {
       if (state.scenario !== "flight") {
         state.scenario = "flight";
       }
-      let mapped = 2;
-      if (stage >= 1 && stage <= 3) mapped = 2;
-      else if (stage >= 4) mapped = 3;
+      let mapped = 2; // stage 0 or 1
+      if (params.stage >= 1 && params.stage <= 3) mapped = 2; // Mask Passport & Payment
+      else if (params.stage >= 4) mapped = 3; // Confirm Booking
       if (state.stepIndex !== mapped) {
         state.stepIndex = mapped;
         const steps = FLIGHT_STEPS;
@@ -359,14 +417,14 @@ export const workflowGuide = {
       return;
     }
 
-    // Mapping demo stage (0..5) to guide step in banking flow
+    // 6. If panel is open and running banking flow
     if (state.scenario === "banking") {
-      let mapped = 2; // stage 0 or 1
-      if (stage === 1) mapped = 2;
-      else if (stage === 2) mapped = 3;
-      else if (stage === 3) mapped = 4;
-      else if (stage === 4) mapped = 5;
-      else if (stage === 5) mapped = 6;
+      let mapped = 2; // stage 0 or 1: local-protect
+      if (params.stage === 1) mapped = 2; // local-protect (PII redaction)
+      else if (params.stage === 2) mapped = 3; // safe-context
+      else if (params.stage === 3) mapped = 4; // cloud-reasoning
+      else if (params.stage === 4) mapped = 5; // verify-action
+      else if (params.stage === 5) mapped = 6; // execute-action
       if (state.stepIndex !== mapped) {
         state.stepIndex = mapped;
         const steps = BANKING_STEPS;
@@ -374,6 +432,9 @@ export const workflowGuide = {
         emit();
       }
     }
+  },
+  syncWithDemoStage: (stage: number, scenario: string | null, panelOpen: boolean) => {
+    workflowGuide.syncState({ stage, scenario, panelOpen });
   },
 };
 
