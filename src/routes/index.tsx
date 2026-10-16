@@ -2,6 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { ArrowRight, Eye, Gauge, MousePointerClick, Plane, ShieldCheck, Sparkles } from "lucide-react";
 import { PrivacyFlow } from "@/components/aithos/PrivacyFlow";
 import { demo } from "@/lib/aithos-demo";
+import { workflowGuide } from "@/lib/workflow-guide";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -35,12 +36,16 @@ function Landing() {
   const navigate = useNavigate();
 
   const startDemo = () => {
+    workflowGuide.setActive(true);
+    workflowGuide.setScenario("banking");
     demo.closePanel();
     demo.reset();
     navigate({ to: "/bank" });
   };
 
   const startFlightDemo = () => {
+    workflowGuide.setActive(true);
+    workflowGuide.setScenario("flight");
     demo.closePanel();
     demo.reset();
     navigate({ to: "/travel" });

@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { AgentLauncher, AgentPanel } from "@/components/aithos/AgentPanel";
 import { PrivacyFlow } from "@/components/aithos/PrivacyFlow";
+import { WorkflowBeacon } from "@/components/aithos/WorkflowBeacon";
 import {
   CLOUD_WORK,
   COMMANDS,
@@ -47,16 +48,23 @@ function Panel({
   title,
   children,
   className,
+  action,
+  id,
 }: {
   title: string;
   children: React.ReactNode;
   className?: string;
+  action?: React.ReactNode;
+  id?: string;
 }) {
   return (
-    <section className={cn("rounded-2xl border border-border bg-surface/60 p-6", className)}>
-      <h2 className="font-mono text-[11px] tracking-[0.18em] text-muted-foreground uppercase">
-        {title}
-      </h2>
+    <section id={id} className={cn("rounded-2xl border border-border bg-surface/60 p-6", className)}>
+      <div className="flex items-center justify-between">
+        <h2 className="font-mono text-[11px] tracking-[0.18em] text-muted-foreground uppercase">
+          {title}
+        </h2>
+        {action}
+      </div>
       <div className="mt-4">{children}</div>
     </section>
   );
@@ -127,7 +135,17 @@ function ConsolePage() {
               <p className="text-xl font-medium">{command}</p>
             </Panel>
 
-            <Panel title="Local Protection">
+            <Panel
+              id="console-local-protection"
+              title="Local Protection"
+              action={
+                <WorkflowBeacon
+                  title="On-Device PII Protection Audit"
+                  whatToDo="Review the list of personal fields detected on the active page."
+                  whatHappensAfter="AITHOS flags and protects 100% of detected sensitive items directly on-device before constructing outbound network context."
+                />
+              }
+            >
               <div className="flex flex-wrap gap-8">
                 <div>
                   <div className="text-xs text-muted-foreground">Sensitive items detected</div>
@@ -164,7 +182,17 @@ function ConsolePage() {
               </ul>
             </Panel>
 
-            <Panel title="AI Context">
+            <Panel
+              id="console-ai-context"
+              title="AI Context"
+              action={
+                <WorkflowBeacon
+                  title="Cryptographic Zero-Leak Guarantee"
+                  whatToDo="Observe the '0' Raw PII shared metric."
+                  whatHappensAfter="Synthetic tokens replaced all actual values. Even if cloud models are logged or trained, no customer PII was ever transmitted."
+                />
+              }
+            >
               <div className="flex flex-wrap items-center justify-between gap-6">
                 <div className="flex items-center gap-2 text-sm">
                   <Check className="size-4 text-[var(--color-success)]" /> Useful context preserved
@@ -178,7 +206,17 @@ function ConsolePage() {
               </div>
             </Panel>
 
-            <Panel title="Where The Work Happens">
+            <Panel
+              id="console-split-compute"
+              title="Where The Work Happens"
+              action={
+                <WorkflowBeacon
+                  title="Split-Compute Privacy Architecture"
+                  whatToDo="Compare tasks executed locally on your machine vs in the cloud."
+                  whatHappensAfter="Heavy privacy-critical operations (tokenization, DOM reading, action click) stay local. Cloud AI is strictly used for high-level reasoning."
+                />
+              }
+            >
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="rounded-xl border border-primary/30 bg-primary/8 p-4">
                   <div className="flex items-center gap-2 text-sm font-semibold text-primary">
@@ -247,7 +285,17 @@ function ConsolePage() {
               )}
             </Panel>
 
-            <Panel title="Safety">
+            <Panel
+              id="console-safety-panel"
+              title="Safety"
+              action={
+                <WorkflowBeacon
+                  title="Intent Guardrail Validation"
+                  whatToDo="Review the action validation state (Approved / Pending / Blocked)."
+                  whatHappensAfter="AITHOS validates the suggested action against on-device policies before allowing any browser interaction."
+                />
+              }
+            >
               <div className="text-xs text-muted-foreground">Action validation</div>
               {blocked ? (
                 <div className="mt-1.5 flex items-center gap-2 font-display text-lg font-semibold text-[var(--color-destructive)]">

@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { CheckCircle2, Plane, ShieldCheck, Ticket } from "lucide-react";
 import { useState } from "react";
 import { AgentLauncher, AgentPanel } from "@/components/aithos/AgentPanel";
+import { WorkflowBeacon } from "@/components/aithos/WorkflowBeacon";
 import { FLIGHT_FIELDS, useDemo } from "@/lib/aithos-demo";
 import { cn } from "@/lib/utils";
 
@@ -68,6 +69,7 @@ function TravelPage() {
             ))}
           </nav>
           <Link
+            id="nav-privacy-console"
             to="/console"
             className="rounded-lg border border-primary/30 px-3.5 py-1.5 text-xs font-medium text-primary transition-colors hover:bg-primary/10"
           >
@@ -124,9 +126,16 @@ function TravelPage() {
               </ul>
             </div>
 
-            <div className="relative overflow-hidden rounded-2xl bg-[var(--gradient-surface)] p-7 glow-border">
+            <div id="passenger-details-card" className="relative overflow-hidden rounded-2xl bg-[var(--gradient-surface)] p-7 glow-border">
               <div className="flex items-center justify-between">
-                <h2 className="text-base font-semibold">Traveller & payment details</h2>
+                <div className="flex items-center gap-2">
+                  <h2 className="text-base font-semibold">Traveller & payment details</h2>
+                  <WorkflowBeacon
+                    title="Traveller & Payment Data"
+                    whatToDo="Watch passport and saved card data get detected on this page."
+                    whatHappensAfter="AITHOS swaps them with [PASSPORT] and [CARD] placeholder tokens before communicating with the model."
+                  />
+                </div>
                 {protecting && (
                   <span className="inline-flex items-center gap-1 rounded-full bg-primary/12 px-2.5 py-1 text-[10px] font-medium text-primary">
                     <ShieldCheck className="size-3" /> Protected
@@ -150,22 +159,29 @@ function TravelPage() {
               </dl>
 
               <div className="mt-8 flex flex-wrap items-center gap-3">
-                <button
-                  id="confirm-booking"
-                  onClick={() => setManual(true)}
-                  className={cn(
-                    "relative inline-flex items-center gap-2.5 rounded-xl bg-primary px-6 py-3.5 text-sm font-semibold text-primary-foreground transition-all",
-                    s.clicking && s.scenario === "flight"
-                      ? "scale-[0.97] shadow-[var(--glow-strong)] ring-4 ring-primary/40"
-                      : "hover:opacity-90",
-                  )}
-                >
-                  {s.clicking && s.scenario === "flight" && (
-                    <span className="absolute -inset-1.5 animate-pulse rounded-2xl ring-2 ring-primary/60" />
-                  )}
-                  <Ticket className="size-4" />
-                  Confirm Booking
-                </button>
+                <div className="relative inline-flex items-center gap-2">
+                  <button
+                    id="confirm-booking-btn"
+                    onClick={() => setManual(true)}
+                    className={cn(
+                      "relative inline-flex items-center gap-2.5 rounded-xl bg-primary px-6 py-3.5 text-sm font-semibold text-primary-foreground transition-all",
+                      s.clicking && s.scenario === "flight"
+                        ? "scale-[0.97] shadow-[var(--glow-strong)] ring-4 ring-primary/40"
+                        : "hover:opacity-90",
+                    )}
+                  >
+                    {s.clicking && s.scenario === "flight" && (
+                      <span className="absolute -inset-1.5 animate-pulse rounded-2xl ring-2 ring-primary/60" />
+                    )}
+                    <Ticket className="size-4" />
+                    Confirm Booking
+                  </button>
+                  <WorkflowBeacon
+                    title="Confirm Booking Action"
+                    whatToDo="Click this directly or ask AITHOS: 'Book my flight to Delhi'."
+                    whatHappensAfter="AITHOS securely re-fills the form with real values on-device and clicks confirm without transmitting your credit card or passport to cloud AI."
+                  />
+                </div>
                 <button
                   id="change-seats"
                   onClick={() => setSeatManual(true)}

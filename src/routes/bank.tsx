@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { AgentLauncher, AgentPanel } from "@/components/aithos/AgentPanel";
+import { WorkflowBeacon } from "@/components/aithos/WorkflowBeacon";
 import { useDemo } from "@/lib/aithos-demo";
 import { cn } from "@/lib/utils";
 
@@ -90,6 +91,7 @@ function BankPage() {
             ))}
           </nav>
           <Link
+            id="nav-privacy-console"
             to="/console"
             className="rounded-lg border border-primary/30 px-3.5 py-1.5 text-xs font-medium text-primary transition-colors hover:bg-primary/10"
           >
@@ -119,8 +121,15 @@ function BankPage() {
             <div className="relative overflow-hidden rounded-2xl bg-[var(--gradient-surface)] p-7 glow-border">
               <div className="flex flex-wrap items-start justify-between gap-6">
                 <div>
-                  <div className="text-xs tracking-widest text-muted-foreground uppercase">
-                    Available Balance
+                  <div className="flex items-center gap-2">
+                    <div className="text-xs tracking-widest text-muted-foreground uppercase">
+                      Available Balance
+                    </div>
+                    <WorkflowBeacon
+                      title="Account Balance & Number"
+                      whatToDo="Observe how the account number is protected with [ACCOUNT NUMBER] when AITHOS runs."
+                      whatHappensAfter="The raw 12-digit number stays strictly in local browser memory. The cloud model never receives your real bank number."
+                    />
                   </div>
                   <div className="mt-2 font-display text-4xl font-bold">₹1,24,560.00</div>
                   <div className="mt-4 text-xs text-muted-foreground">Account Number</div>
@@ -139,20 +148,27 @@ function BankPage() {
               </div>
 
               <div className="mt-8 flex flex-wrap items-center gap-3">
-                <button
-                  id="download-statement"
-                  onClick={() => setManualDownload(true)}
-                  className={cn(
-                    "relative inline-flex items-center gap-2.5 rounded-xl bg-primary px-6 py-3.5 text-sm font-semibold text-primary-foreground transition-all",
-                    act("statement") ? ring("statement") : "hover:opacity-90",
-                  )}
-                >
-                  {act("statement") && (
-                    <span className="absolute -inset-1.5 animate-pulse rounded-2xl ring-2 ring-primary/60" />
-                  )}
-                  <ArrowDownToLine className="size-4" />
-                  Download Latest Statement
-                </button>
+                <div className="relative inline-flex items-center gap-2">
+                  <button
+                    id="download-statement"
+                    onClick={() => setManualDownload(true)}
+                    className={cn(
+                      "relative inline-flex items-center gap-2.5 rounded-xl bg-primary px-6 py-3.5 text-sm font-semibold text-primary-foreground transition-all",
+                      act("statement") ? ring("statement") : "hover:opacity-90",
+                    )}
+                  >
+                    {act("statement") && (
+                      <span className="absolute -inset-1.5 animate-pulse rounded-2xl ring-2 ring-primary/60" />
+                    )}
+                    <ArrowDownToLine className="size-4" />
+                    Download Latest Statement
+                  </button>
+                  <WorkflowBeacon
+                    title="Download Statement Action"
+                    whatToDo="Click this button directly, or ask AITHOS: 'Download my latest statement'."
+                    whatHappensAfter="The statement PDF is downloaded locally. The agent operates within your browser and never shares account credentials with the cloud."
+                  />
+                </div>
                 <button
                   id="view-transactions"
                   onClick={() => setManualView("transactions")}
@@ -215,9 +231,16 @@ function BankPage() {
           </section>
 
           <aside className="space-y-6">
-            <div className="rounded-2xl border border-border bg-surface/60 p-6">
+            <div id="customer-info-card" className="rounded-2xl border border-border bg-surface/60 p-6">
               <div className="flex items-center justify-between">
-                <h2 className="text-base font-semibold">Customer Information</h2>
+                <div className="flex items-center gap-2">
+                  <h2 className="text-base font-semibold">Customer Information</h2>
+                  <WorkflowBeacon
+                    title="Customer Personal Identifiers"
+                    whatToDo="Watch this card when the agent runs. Rahul's name, email, phone, and PAN are automatically protected."
+                    whatHappensAfter="AITHOS replaces each sensitive detail with placeholder tokens like [ACCOUNT NUMBER]. No real identity data is transmitted to cloud AI."
+                  />
+                </div>
                 {s.stage >= 2 && s.scenario !== "leak" && (
                   <span className="inline-flex items-center gap-1 rounded-full bg-primary/12 px-2.5 py-1 text-[10px] font-medium text-primary">
                     <ShieldCheck className="size-3" /> Protected

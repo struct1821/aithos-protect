@@ -14,6 +14,7 @@ import {
   Send,
   ShieldAlert,
   ShieldCheck,
+  Sparkles,
   X,
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
@@ -31,7 +32,111 @@ import {
   useDemo,
   type Scenario,
 } from "@/lib/aithos-demo";
+import { workflowGuide } from "@/lib/workflow-guide";
 import { cn } from "@/lib/utils";
+
+function InPanelWorkflowGuide({
+  stage,
+  scenario,
+  working,
+  blocked,
+  downloaded,
+}: {
+  stage: number;
+  scenario: Scenario | null;
+  working: boolean;
+  blocked: boolean;
+  downloaded: boolean;
+}) {
+  const [open, setOpen] = useState(true);
+
+  let stepTitle = "Submit a Task";
+  let whatToDo = "Click a suggested action below or enter a custom prompt in the input.";
+  let whatHappensAfter =
+    "AITHOS will locally inspect the page DOM, identify target buttons, and detect personal information before any network connection is made.";
+
+  if (scenario === "leak") {
+    stepTitle = "Privacy Policy Guardrails Triggered";
+    whatToDo = "Observe the red blocked alert and redacted credentials.";
+    whatHappensAfter =
+      "The request was stopped on-device. The account number was never transmitted across the network, preserving strict data protection.";
+  } else if (stage === 0) {
+    stepTitle = "Step 1: Understanding Intent";
+    whatToDo = "Wait for intent parsing to complete, or click 'Next'.";
+    whatHappensAfter =
+      "AITHOS maps your command to actionable browser goals and prepares the local redaction engine.";
+  } else if (stage === 1) {
+    stepTitle = "Step 2: Detecting & Redacting PII";
+    whatToDo = "Notice the detected sensitive items. Click 'Next' to sanitize them with placeholder tokens.";
+    whatHappensAfter =
+      "All sensitive items (names, account numbers, emails) are replaced with synthetic tokens like [ACCOUNT NUMBER]. Zero personal details leave your computer.";
+  } else if (stage === 2) {
+    stepTitle = "Step 3: Safe Context Construction";
+    whatToDo = "Review the BEFORE vs AFTER token comparison. Click 'Next' to send safe context.";
+    whatHappensAfter =
+      "A sanitized payload is created with 0 raw personal items. Only non-sensitive structure and tokens are sent to the cloud model.";
+  } else if (stage === 3) {
+    stepTitle = "Step 4: Cloud AI Reasoning";
+    whatToDo = "Inspect the Cloud Request text. Click 'Next' to evaluate the recommended action.";
+    whatHappensAfter =
+      "The cloud AI reads the safe tokens, selects the best matching button on the page, and sends only the control name back to your device.";
+  } else if (stage === 4) {
+    stepTitle = "Step 5: Intent & Safety Verification";
+    whatToDo = "Review the 4 guardrail checks. Click 'Next' to authorize execution.";
+    whatHappensAfter =
+      "The on-device engine confirms that the proposed button click will not compromise any data, leak credentials, or perform an unauthorized action.";
+  } else if (stage === 5) {
+    stepTitle = downloaded ? "Task Completed Successfully" : "Step 6: Safe Local Execution";
+    whatToDo = downloaded
+      ? "Click 'Privacy Console' to view the verified zero-leak audit."
+      : "Watch the page button trigger and download the file.";
+    whatHappensAfter = downloaded
+      ? "A full immutable audit trail has been logged in your local Privacy Console showing 0 data leaks."
+      : "The browser simulates the click on your device. The statement PDF is downloaded locally.";
+  }
+
+  return (
+    <div className="rounded-xl border border-primary/30 bg-primary/8 p-3 shadow-sm transition-all duration-300">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-1.5 text-xs font-semibold text-primary">
+          <Sparkles className="size-3.5 animate-pulse" />
+          <span>Workflow Guide: {stepTitle}</span>
+        </div>
+        <button
+          type="button"
+          onClick={() => setOpen(!open)}
+          className="text-[10px] text-muted-foreground hover:text-foreground transition-colors"
+        >
+          {open ? "Minimize" : "Expand"}
+        </button>
+      </div>
+
+      {open && (
+        <div className="mt-2.5 space-y-2 text-xs animate-rise">
+          <div className="rounded-lg bg-surface/80 p-2.5 border border-border">
+            <div className="flex items-center gap-1.5 text-[10px] font-bold tracking-wider text-primary uppercase">
+              <span className="flex size-3.5 items-center justify-center rounded-full bg-primary text-primary-foreground text-[9px] font-mono">
+                1
+              </span>
+              What to do
+            </div>
+            <p className="mt-1 text-foreground font-medium leading-relaxed">{whatToDo}</p>
+          </div>
+
+          <div className="rounded-lg bg-[color-mix(in_oklab,var(--success)_10%,transparent)] p-2.5 border border-[color-mix(in_oklab,var(--success)_30%,transparent)]">
+            <div className="flex items-center gap-1.5 text-[10px] font-bold tracking-wider text-[var(--color-success)] uppercase">
+              <span className="flex size-3.5 items-center justify-center rounded-full bg-[var(--color-success)] text-background text-[9px] font-mono">
+                2
+              </span>
+              What happens after doing that
+            </div>
+            <p className="mt-1 text-muted-foreground leading-relaxed">{whatHappensAfter}</p>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
 
 function StageHeader({ title, done }: { title: string; done: boolean }) {
   return (
@@ -80,9 +185,9 @@ function Say({ text, typing }: { text: string | null; typing?: boolean }) {
   );
 }
 
-function Card({ children, className }: { children: React.ReactNode; className?: string }) {
+function Card({ children, className, id }: { children: React.ReactNode; className?: string; id?: string }) {
   return (
-    <div className={cn("animate-rise rounded-xl border border-border bg-surface/70 p-4", className)}>
+    <div id={id} className={cn("animate-rise rounded-xl border border-border bg-surface/70 p-4", className)}>
       {children}
     </div>
   );
@@ -102,6 +207,9 @@ export function AgentPanel({
     if (s.panelOpen) inputRef.current?.focus();
   }, [s.panelOpen, s.stage]);
 
+  useEffect(() => {
+    workflowGuide.syncWithDemoStage(s.stage, s.scenario, s.panelOpen);
+  }, [s.stage, s.scenario, s.panelOpen]);
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
@@ -169,13 +277,22 @@ export function AgentPanel({
         </div>
       )}
 
-      <div ref={scrollRef} className="flex-1 space-y-3 overflow-y-auto px-5 py-4">
+      <div ref={scrollRef} id="agent-panel-content" className="flex-1 space-y-3 overflow-y-auto px-5 py-4">
+        {/* In-Panel Workflow Guide explaining what to do and what happens */}
+        <InPanelWorkflowGuide
+          stage={s.stage}
+          scenario={s.scenario}
+          working={s.working}
+          blocked={s.blocked}
+          downloaded={s.downloaded}
+        />
+
         {s.stage < 0 && (
           <div className="space-y-4">
             <p className="text-sm text-muted-foreground">
               Type what you'd like me to do on this page.
             </p>
-            <div className="space-y-2">
+            <div id="agent-prompt-suggestions" className="space-y-2">
               {scenarios.map((sc) => {
                 const danger = sc === "leak";
                 return (
@@ -293,7 +410,7 @@ export function AgentPanel({
               <Say text={agentLine(s.scenario!, 1, s.seed)} typing={s.stage === 1 && s.working} />
             )}
             {s.stage >= 1 && (
-              <Card>
+              <Card id="agent-protect-card">
                 <StageHeader title={STAGES[1]!.title} done={s.stage > 1 || !s.working} />
                 <div className="relative mt-3 overflow-hidden rounded-lg bg-background/60 p-3">
                   {s.stage === 1 && s.working && (
@@ -327,7 +444,7 @@ export function AgentPanel({
               <Say text={agentLine(s.scenario!, 2, s.seed)} typing={s.stage === 2 && s.working} />
             )}
             {s.stage >= 2 && (
-              <Card>
+              <Card id="agent-safe-context-card">
                 <StageHeader title={STAGES[2]!.title} done={s.stage > 2 || !s.working} />
                 <div className="mt-3 grid grid-cols-2 gap-3">
                   <div className="rounded-lg border border-border bg-background/50 p-3">
@@ -373,7 +490,7 @@ export function AgentPanel({
               <Say text={agentLine(s.scenario!, 3, s.seed)} typing={s.stage === 3 && s.working} />
             )}
             {s.stage >= 3 && (
-              <Card>
+              <Card id="agent-split-compute-card">
                 <StageHeader title={STAGES[3]!.title} done={s.stage > 3 || !s.working} />
                 <div className="mt-3 grid gap-2 sm:grid-cols-2">
                   <div className="rounded-lg border border-primary/30 bg-primary/8 p-3">
@@ -429,7 +546,7 @@ export function AgentPanel({
               <Say text={agentLine(s.scenario!, 4, s.seed)} typing={s.stage === 4 && s.working} />
             )}
             {s.stage >= 4 && (
-              <Card>
+              <Card id="agent-verification-card">
                 <StageHeader title={STAGES[4]!.title} done={s.stage > 4 || !s.working} />
                 <ul className="mt-3 space-y-1.5">
                   {[
@@ -550,6 +667,7 @@ export function AgentLauncher() {
   const s = useDemo();
   return (
     <button
+      id="agent-launcher-btn"
       onClick={demo.togglePanel}
       className="group fixed right-6 bottom-6 z-50 inline-flex items-center gap-2.5 rounded-full bg-primary px-5 py-3.5 text-sm font-semibold text-primary-foreground shadow-[var(--glow-strong)] transition-transform hover:scale-[1.03]"
     >
