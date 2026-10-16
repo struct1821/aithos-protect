@@ -35,109 +35,6 @@ import {
 import { workflowGuide } from "@/lib/workflow-guide";
 import { cn } from "@/lib/utils";
 
-function InPanelWorkflowGuide({
-  stage,
-  scenario,
-  working,
-  blocked,
-  downloaded,
-}: {
-  stage: number;
-  scenario: Scenario | null;
-  working: boolean;
-  blocked: boolean;
-  downloaded: boolean;
-}) {
-  const [open, setOpen] = useState(true);
-
-  let stepTitle = "Submit a Task";
-  let whatToDo = "Click a suggested action below or enter a custom prompt in the input.";
-  let whatHappensAfter =
-    "AITHOS will locally inspect the page DOM, identify target buttons, and detect personal information before any network connection is made.";
-
-  if (scenario === "leak") {
-    stepTitle = "Privacy Policy Guardrails Triggered";
-    whatToDo = "Observe the red blocked alert and redacted credentials.";
-    whatHappensAfter =
-      "The request was stopped on-device. The account number was never transmitted across the network, preserving strict data protection.";
-  } else if (stage === 0) {
-    stepTitle = "Step 1: Understanding Intent";
-    whatToDo = "Wait for intent parsing to complete, or click 'Next'.";
-    whatHappensAfter =
-      "AITHOS maps your command to actionable browser goals and prepares the local redaction engine.";
-  } else if (stage === 1) {
-    stepTitle = "Step 2: Detecting & Redacting PII";
-    whatToDo = "Notice the detected sensitive items. Click 'Next' to sanitize them with placeholder tokens.";
-    whatHappensAfter =
-      "All sensitive items (names, account numbers, emails) are replaced with synthetic tokens like [ACCOUNT NUMBER]. Zero personal details leave your computer.";
-  } else if (stage === 2) {
-    stepTitle = "Step 3: Safe Context Construction";
-    whatToDo = "Review the BEFORE vs AFTER token comparison. Click 'Next' to send safe context.";
-    whatHappensAfter =
-      "A sanitized payload is created with 0 raw personal items. Only non-sensitive structure and tokens are sent to the cloud model.";
-  } else if (stage === 3) {
-    stepTitle = "Step 4: Cloud AI Reasoning";
-    whatToDo = "Inspect the Cloud Request text. Click 'Next' to evaluate the recommended action.";
-    whatHappensAfter =
-      "The cloud AI reads the safe tokens, selects the best matching button on the page, and sends only the control name back to your device.";
-  } else if (stage === 4) {
-    stepTitle = "Step 5: Intent & Safety Verification";
-    whatToDo = "Review the 4 guardrail checks. Click 'Next' to authorize execution.";
-    whatHappensAfter =
-      "The on-device engine confirms that the proposed button click will not compromise any data, leak credentials, or perform an unauthorized action.";
-  } else if (stage === 5) {
-    stepTitle = downloaded ? "Task Completed Successfully" : "Step 6: Safe Local Execution";
-    whatToDo = downloaded
-      ? "Click 'Privacy Console' to view the verified zero-leak audit."
-      : "Watch the page button trigger and download the file.";
-    whatHappensAfter = downloaded
-      ? "A full immutable audit trail has been logged in your local Privacy Console showing 0 data leaks."
-      : "The browser simulates the click on your device. The statement PDF is downloaded locally.";
-  }
-
-  return (
-    <div className="rounded-xl border border-primary/30 bg-primary/8 p-3 shadow-sm transition-all duration-300">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-1.5 text-xs font-semibold text-primary">
-          <Sparkles className="size-3.5 animate-pulse" />
-          <span>Workflow Guide: {stepTitle}</span>
-        </div>
-        <button
-          type="button"
-          onClick={() => setOpen(!open)}
-          className="text-[10px] text-muted-foreground hover:text-foreground transition-colors"
-        >
-          {open ? "Minimize" : "Expand"}
-        </button>
-      </div>
-
-      {open && (
-        <div className="mt-2.5 space-y-2 text-xs animate-rise">
-          <div className="rounded-lg bg-surface/80 p-2.5 border border-border">
-            <div className="flex items-center gap-1.5 text-[10px] font-bold tracking-wider text-primary uppercase">
-              <span className="flex size-3.5 items-center justify-center rounded-full bg-primary text-primary-foreground text-[9px] font-mono">
-                1
-              </span>
-              What to do
-            </div>
-            <p className="mt-1 text-foreground font-medium leading-relaxed">{whatToDo}</p>
-          </div>
-
-          <div className="rounded-lg bg-[color-mix(in_oklab,var(--success)_10%,transparent)] p-2.5 border border-[color-mix(in_oklab,var(--success)_30%,transparent)]">
-            <div className="flex items-center gap-1.5 text-[10px] font-bold tracking-wider text-[var(--color-success)] uppercase">
-              <span className="flex size-3.5 items-center justify-center rounded-full bg-[var(--color-success)] text-background text-[9px] font-mono">
-                2
-              </span>
-              What happens after doing that
-            </div>
-            <p className="mt-1 text-muted-foreground leading-relaxed">{whatHappensAfter}</p>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
-
 function StageHeader({ title, done }: { title: string; done: boolean }) {
   return (
     <div className="flex items-center gap-2.5 text-sm">
@@ -278,14 +175,6 @@ export function AgentPanel({
       )}
 
       <div ref={scrollRef} id="agent-panel-content" className="flex-1 space-y-3 overflow-y-auto px-5 py-4">
-        {/* In-Panel Workflow Guide explaining what to do and what happens */}
-        <InPanelWorkflowGuide
-          stage={s.stage}
-          scenario={s.scenario}
-          working={s.working}
-          blocked={s.blocked}
-          downloaded={s.downloaded}
-        />
 
         {s.stage < 0 && (
           <div className="space-y-4">

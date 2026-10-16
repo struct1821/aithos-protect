@@ -12,7 +12,8 @@ import { useEffect, type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { WorkflowSpotlight } from "@/components/aithos/WorkflowSpotlight";
-import { WorkflowGuideBar } from "@/components/aithos/WorkflowGuideBar";
+import { WorkflowHintBox } from "@/components/aithos/WorkflowHintBox";
+import { WorkflowStepsBottomBox } from "@/components/aithos/WorkflowStepsBottomBox";
 
 function NotFoundComponent() {
   return (
@@ -131,7 +132,8 @@ function RootComponent() {
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <Outlet />
       <WorkflowSpotlight />
-      <WorkflowGuideBar />
+      <WorkflowHintBox />
+      <WorkflowStepsBottomBox />
     </QueryClientProvider>
   );
 }
